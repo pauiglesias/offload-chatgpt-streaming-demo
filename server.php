@@ -47,7 +47,7 @@ function remoteRequest($message, $fromStatusUrl = null) {
 		curl_setopt_array($curl, remoteRequestOptions($message, $fromStatusUrl));
 		$response = curl_exec($curl);
 		curl_close($curl);
-		return $response;
+		return json_decode($response, true);
 
 	} catch(Exception $e) {
 		error_log($e->getMessage());
@@ -77,7 +77,9 @@ function remoteRequestOptionsArgs($message, $fromStatusUrl) {
 
 	$args = [
 		'api_key'	=> getenv('OPENAI_API_KEY'),
-		'messages'	=> json_encode(['role' => 'user', 'content' => $message]),
+		'messages'	=> json_encode([
+			['role' => 'user', 'content' => $message],
+		]),
 	];
 
 	return $args;
