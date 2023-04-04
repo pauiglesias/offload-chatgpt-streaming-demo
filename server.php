@@ -15,7 +15,6 @@ function postRequest() {
 function streamRequest() {
 	$message = trim($_POST['message']);
 	$chatId = empty($_POST['chat_id']) ? uniqid() : $_POST['chat_id'];
-	//$fromStatusUrl = '';
 	streamRequestOutput($chatId, $message);
 }
 
@@ -39,6 +38,9 @@ function streamRequestData($chatId, $message) {
 
 
 function remoteRequest($message, $fromStatusUrl = null) {
+
+	readEnv();
+	set_time_limit(60);
 
 	try {
 		$curl = curl_init();
@@ -79,6 +81,49 @@ function remoteRequestOptionsArgs($message, $fromStatusUrl) {
 	];
 
 	return $args;
+}
+
+
+
+function readEnv() {
+
+	if (!readEnvTest()) {
+		return;
+	}
+
+	foreach (readEnvLines() as $line) {
+		if ('' !== $line) {
+			readEnvPut($line);
+		}
+	}
+}
+
+
+
+function readEnvTest() {
+
+	static $processed;
+	if (isset($processed)) {
+		return false;
+	}
+
+	$processed = true;
+	return true;
+}
+
+
+
+function readEnvPut($line) {
+	list($name, $value) = array_map('trim', explode('=', $line, 2));
+	if ('' !== $name && '' !== $value) {
+		putenv("$name=$value");
+	}
+}
+
+
+
+function readEnvLines() {
+	return array_map('trim', explode("\n", (string) @file_get_contents(__DIR__.'/.env')));
 }
 
 
