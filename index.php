@@ -23,8 +23,13 @@
 			</div>
 
 			<form class="chat-input">
-				<input type="text" placeholder="Enter your message..." require>
+
+				<div class="chat-input-text">
+					<textarea placeholder="Enter your message..." require></textarea>
+				</div>
+
 				<button type="submit">Send</button>
+
 			</form>
 
 		</div>

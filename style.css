@@ -33,8 +33,33 @@ body {
 			.chat-messages {
 				flex-grow: 1;
 				background: blue;
+				display: flex;
+				flex-direction: column;
 			}
+
+				.chat-messages-item {
+					color: #fff;
+					margin: 10px;
+					padding: 5px 10px;
+				}
+
+				.chat-messages-input { background-color: black; }
+				.chat-messages-output { background-color: grey; }
 
 			.chat-input {
 				height: 10%;
+				background-color: grey;
+				padding: 10px;
 			}
+
+				.chat-input-text {
+					width: 100%;
+				}
+
+					.chat-input-text textarea {
+						width: 100%;
+						min-width: 100%;
+						max-width: 100%;
+						height: 25px;
+						border: 0;
+					}
