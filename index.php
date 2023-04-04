@@ -8,29 +8,33 @@
 </head>
 <body>
 
-<section class="msger">
+<div class="chat-wrapper">
 
-    <header class="msger-header">
-        <div class="msger-header-title">
-            <i class="fas fa-comment-alt"></i> ChatGPT
-            &nbsp;| ID: <input type="text" id="id" hidden> <span class="id_session"></span>
-        </div>
-        <div class="msger-header-options">
-            <button id="delete-button">Delete History</button>
-        </div>
-    </header>
+	<div class="chat">
 
-    <main class="msger-chat">
-    </main>
+		<div class="chat-sidebar">
 
-    <form class="msger-inputarea">
-        <input class="msger-input" placeholder="Enter your message..." require>
-        <button type="submit" class="msger-send-btn">Send</button>
-    </form>
+		</div>
 
-</section>
+		<div class="chat-content">
 
-<script src="./script.js"></script>
+			<div class="chat-messages">
+
+			</div>
+
+			<form class="chat-input">
+				<input type="text" placeholder="Enter your message..." require>
+				<button type="submit">Send</button>
+			</form>
+
+		</div>
+
+	</div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.slim.min.js" integrity="sha256-a2yjHM4jnF9f54xUQakjZGaqYs/V1CYvWpoqZzC2/Bw=" crossorigin="anonymous"></script>
+<script src="./client.js"></script>
 
 </body>
 </html>
