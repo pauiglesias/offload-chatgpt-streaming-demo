@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<?php include __DIR__.'/server.php';?><!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -16,7 +16,7 @@
 
 		</div>
 
-		<div class="chat-content">
+		<div class="chat-content" data-id="">
 
 			<div class="chat-messages">
 

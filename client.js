@@ -26,14 +26,32 @@ $(function() {
 		$input.val('');
 		$button.attr('disabled', 'disabled');
 
-		addMessage(message, $form, 'input');
+		addMessage($form, message, 'input');
+		sendMessage($form, message);
 	}
 
 
 
-	function addMessage(message, $form, type) {
+	function addMessage($form, message, type) {
 		const div = '<div class="chat-messages-item chat-messages-' + type + '"><div class="chat-text">' + message + '</div></div>';
 		$form.closest('.chat-content').find('.chat-messages').append(div);
+	}
+
+
+
+	function sendMessage($form, message) {
+
+		const data = {
+			chat_id: $form.closest('.chat-content').attr('data-id'),
+			message: message
+		};
+
+		$.post('/server.php', data, function(e) {
+			console.log(e);
+
+		}).fail(function(e) {
+			console.log(e);
+		});
 	}
 
 
