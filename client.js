@@ -56,8 +56,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 		const chatId = $content.attr('data-id');
 
 		const data = {
-			chat_id: chatId,
-			message: message
+			chat_id		: chatId,
+			message		: message,
+			status_url	: $content.attr('data-status-url')
 		};
 
 		$.post('/server.php', data, function(e) {
@@ -75,6 +76,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 			if (!chatId) {
 				$content.attr('data-id', e.chat_id);
 			}
+
+			$content.attr('data-status-url', e.response.endpoints.status_url);
 
 			const $div = addMessage($content, '', 'output');
 			streamMessages($content, $div, e.response.endpoints.stream_events_url);
@@ -114,6 +117,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			html += txt.replace(/(?:\r\n|\r|\n)/g, '<br>');
 			$div.html(html);
+
+			scrollBottom($content);
 		};
 
 		eventSource.onerror = function (e) {

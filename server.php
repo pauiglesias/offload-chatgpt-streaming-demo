@@ -13,38 +13,39 @@ function postRequest() {
 
 
 function streamRequest() {
-	$message = trim($_POST['message']);
-	$chatId = empty($_POST['chat_id']) ? uniqid() : $_POST['chat_id'];
-	streamRequestOutput($chatId, $message);
+	$message 	= trim($_POST['message']);
+	$chatId 	= empty($_POST['chat_id']) ? uniqid() : $_POST['chat_id'];
+	$statusUrl 	= empty($_POST['status_url']) ? null  : $_POST['status_url'];
+	streamRequestOutput($chatId, $message, $statusUrl);
 }
 
 
 
-function streamRequestOutput($chatId, $message) {
+function streamRequestOutput($chatId, $message, $statusUrl) {
 	header('Content-Type: application/json');
-	echo json_encode(streamRequestData($chatId, $message));
+	echo json_encode(streamRequestData($chatId, $message, $statusUrl));
 	die;
 }
 
 
 
-function streamRequestData($chatId, $message) {
+function streamRequestData($chatId, $message, $statusUrl) {
 	return [
 		'chat_id'  => $chatId,
-		'response' => remoteRequest($message),
+		'response' => remoteRequest($message, $statusUrl),
 	];
 }
 
 
 
-function remoteRequest($message, $fromStatusUrl = null) {
+function remoteRequest($message, $statusUrl = null) {
 
 	readEnv();
 	set_time_limit(60);
 
 	try {
 		$curl = curl_init();
-		curl_setopt_array($curl, remoteRequestOptions($message, $fromStatusUrl));
+		curl_setopt_array($curl, remoteRequestOptions($message, $statusUrl));
 		$response = curl_exec($curl);
 		curl_close($curl);
 		return json_decode($response, true);
@@ -58,7 +59,7 @@ function remoteRequest($message, $fromStatusUrl = null) {
 
 
 
-function remoteRequestOptions($message, $fromStatusUrl) {
+function remoteRequestOptions($message, $statusUrl) {
 	return [
 		CURLOPT_URL				=> 'https://asyncapi.microdeploy.com/v1/stream-chatgpt',
 		CURLOPT_RETURNTRANSFER	=> true,
@@ -67,13 +68,13 @@ function remoteRequestOptions($message, $fromStatusUrl) {
 		CURLOPT_FOLLOWLOCATION	=> true,
 		CURLOPT_HTTP_VERSION	=> CURL_HTTP_VERSION_1_1,
 		CURLOPT_CUSTOMREQUEST	=> 'POST',
-		CURLOPT_POSTFIELDS		=> http_build_query(remoteRequestOptionsArgs($message, $fromStatusUrl)),
+		CURLOPT_POSTFIELDS		=> http_build_query(remoteRequestOptionsArgs($message, $statusUrl)),
 	];
 }
 
 
 
-function remoteRequestOptionsArgs($message, $fromStatusUrl) {
+function remoteRequestOptionsArgs($message, $statusUrl) {
 
 	$args = [
 		'api_key'	=> getenv('OPENAI_API_KEY'),
@@ -81,6 +82,10 @@ function remoteRequestOptionsArgs($message, $fromStatusUrl) {
 			['role' => 'user', 'content' => $message],
 		]),
 	];
+
+	if (!empty($statusUrl)) {
+		$args['from_status_url'] = $statusUrl;
+	}
 
 	return $args;
 }
