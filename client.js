@@ -3,6 +3,9 @@ $(function() {
 
 
 	let streaming = false;
+	let autoscroll = false;
+	let lastScroll = false;
+	let lastScrollDiv = false;
 
 
 
@@ -31,6 +34,8 @@ $(function() {
 
 		enableInput($content, false);
 		addMessage($content, message, 'input');
+
+		autoscroll = true;
 		scrollBottom($content);
 
 		sendMessage($content, message);
@@ -65,11 +70,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			if (!e || !e.response || !e.response.status) {
 				streaming = false;
+				enableInput($content, true);
 				return;
 			}
 
 			if ('success' != e.response.status) {
 				streaming = false;
+				enableInput($content, true);
 				return;
 			}
 
@@ -80,12 +87,16 @@ blinkEnd(addMessage($content, message, 'output')); */
 			$content.attr('data-status-url', e.response.endpoints.status_url);
 
 			const $div = addMessage($content, '', 'output');
+			scrollBottom($content);
+
 			streamMessages($content, $div, e.response.endpoints.stream_events_url);
 
 		}).fail(function(e) {
-			streaming = false;
 			console.log(e);
+			streaming = false;
+			enableInput($content, true);
 		});
+
 	}
 
 
@@ -131,6 +142,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
+	function enableInput($content, enable) {
+		const $button = $content.find('.chat-input button[type="submit"]');
+		enable ? $button.removeAttr('disabled') : $button.attr('disabled', 'disabled');
+	}
+
+
+
 	function blinkEnd($div) {
 		$div.addClass('chat-messages-output-end');
 	}
@@ -138,16 +156,28 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function scrollBottom($content) {
-		const div = $content.find('.chat-messages')[0];
-		div.scrollTop = div.scrollHeight;
+		if (autoscroll) {
+			const div = $content.find('.chat-messages')[0];
+			div.scrollTop = div.scrollHeight;
+			lastScroll = div.scrollTop;
+			lastScrollDiv = div;
+		}
 	}
 
 
 
-	function enableInput($content, enable) {
-		const $button = $content.find('.chat-input button[type="submit"]');
-		enable ? $button.removeAttr('disabled') : $button.attr('disabled', 'disabled');
-	}
+	$('.chat-messages').scroll(function() {
+
+		if (false === lastScroll ||
+			false == lastScrollDiv) {
+			return;
+		}
+
+		autoscroll = autoscroll
+			? (lastScrollDiv.scrollTop === lastScroll)
+			: streaming && (lastScrollDiv.scrollTop === lastScrollDiv.scrollHeight)
+
+	});
 
 
 
