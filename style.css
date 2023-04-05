@@ -1,8 +1,13 @@
 :root {
+
 	--body-bg: #202123;
-	--text-input-bg: #56382E;
+
+	--text-input-bg: #444554;
+	--text-input-bg-blink: #050509;
+
 	--text-output-bg: grey;
-	--text-output-bg-blink: #B0ACAE;
+	--text-output-bg-blink: #74aa9c;
+
 	--sidebar-bg: #B0ACAE;
 	--content-bg: #B0ACAE;
 }
@@ -48,7 +53,6 @@ body {
 
 				.chat-messages {
 					align-self: flex-start;
-					background: red;
 					overflow-x: hidden;
 					overflow-y: auto;
 					max-height: calc(100% - 100px);
@@ -58,16 +62,35 @@ body {
 						color: #fff;
 						margin: 10px;
 						padding: 5px 10px;
+						border-radius: 3px;
+						min-height: 20px;
+						line-height: 1.5em;
 					}
 
 					.chat-messages-input { background-color: black; }
 					.chat-messages-output { background-color: var(--text-output-bg); }
 
+					.chat-messages-input-wait {
+						-moz-animation:blink-input normal 1s infinite ease-in-out;		/* Firefox */
+						-webkit-animation:blink-output normal 1s infinite ease-in-out;	/* Webkit */
+						-ms-animation:blink-output normal 1s infinite ease-in-out;		/* IE */
+						animation:blink-output normal 1s infinite ease-in-out;			/* Opera */
+					}
+
 					.chat-messages-output-end {
-						-moz-animation:blink normal 3s ease-in-out;		/* Firefox */
-						-webkit-animation:blink normal 3s ease-in-out;	/* Webkit */
-						-ms-animation:blink normal 3s ease-in-out;		/* IE */
-						animation:blink normal 3s ease-in-out;			/* Opera */
+						-moz-animation:blink-output normal 3s ease-in-out;		/* Firefox */
+						-webkit-animation:blink-output normal 3s ease-in-out;	/* Webkit */
+						-ms-animation:blink-output normal 3s ease-in-out;		/* IE */
+						animation:blink-output normal 3s ease-in-out;			/* Opera */
+					}
+
+					.chat-cursor {
+						opacity: .9;
+						display: inline-block;
+						margin: 0 0 4px 4px;
+						width: 9px; height: 1em;
+						background-color: white;
+						vertical-align: middle;
 					}
 
 				.chat-input {
@@ -94,13 +117,27 @@ body {
 								border: 0;
 							}
 
-@keyframes blink {
+
+
+@keyframes blink-input {
+	0%		{ background-color: var(--text-input-bg);			}
+	50%		{ background-color: var(--text-input-bg-blink);	}
+	100%	{ background-color: var(--text-input-bg);			}
+}
+
+@-webkit-keyframes blink-input {
+	0%		{ background-color: var(--text-input-bg);			}
+	50%		{ background-color: var(--text-input-bg-blink);	}
+	100%	{ background-color: var(--text-input-bg);			}
+}
+
+@keyframes blink-output {
 	0%		{ background-color: var(--text-output-bg);			}
 	50%		{ background-color: var(--text-output-bg-blink);	}
 	100%	{ background-color: var(--text-output-bg);			}
 }
 
-@-webkit-keyframes blink {
+@-webkit-keyframes blink-output {
 	0%		{ background-color: var(--text-output-bg);			}
 	50%		{ background-color: var(--text-output-bg-blink);	}
 	100%	{ background-color: var(--text-output-bg);			}

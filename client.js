@@ -49,6 +49,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function addMessage($content, message, type) {
 		const html = '<div class="chat-messages-item chat-messages-' + type + '"><div class="chat-messages-text">' + message + '</div></div>';
 		$content.find('.chat-messages').append(html);
+		return lastMessage($content);
+	}
+
+
+
+	function lastMessage($content) {
 		return $content.find('.chat-messages .chat-messages-item').last();
 	}
 
@@ -84,10 +90,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 				$content.attr('data-id', e.chat_id);
 			}
 
+			const $div = addMessage($content, squareCursor(), 'output');
 			$content.attr('data-status-url', e.response.endpoints.status_url);
-
-			const $div = addMessage($content, '', 'output');
-			scrollBottom($content);
 
 			streamMessages($content, $div, e.response.endpoints.stream_events_url);
 
@@ -104,40 +108,57 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function streamMessages($content, $div, url) {
 
 		let html = '';
+
 		const eventSource = new EventSource(url);
 
-		eventSource.onmessage = function (e) {
+		eventSource.onmessage = function(e) {
 
 			if (e.data == "[DONE]") {
 				eventSource.close();
-				blinkEnd($div);
 				streaming = false;
+				$div.html(html);
+				blinkEnd($div);
 				enableInput($content, true);
 				return;
 			}
 
 			let txt = JSON.parse(e.data).choices[0].delta.content;
 
-			if (undefined === txt) {
+			if (null === txt ||
+				undefined === txt) {
 				return;
 			}
 
+			txt = '' + txt;
 			if ('' === txt) {
 				return;
 			}
 
-			html += txt.replace(/(?:\r\n|\r|\n)/g, '<br>');
-			$div.html(html);
-
+			html += prepareOutput(txt);
+			$div.html(html + squareCursor());
 			scrollBottom($content);
-		};
+		}
 
-		eventSource.onerror = function (e) {
+		eventSource.onerror = function(e) {
 			console.log(e);
 			streaming = false;
+			$div.html(html);
 			enableInput($content, true);
 			eventSource.close();
-		};
+		}
+
+	}
+
+
+
+	function prepareOutput(txt) {
+		return txt.replace(/(?:\r\n|\r|\n)/g, '<br>');
+	}
+
+
+
+	function squareCursor() {
+		return '<span class="chat-cursor">&nbsp;</span>';
 	}
 
 
