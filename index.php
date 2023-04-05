@@ -12,25 +12,31 @@
 
 	<div class="chat">
 
-		<div class="chat-sidebar">
+		<div class="chat-inner">
 
-		</div>
-
-		<div class="chat-content" data-id="">
-
-			<div class="chat-messages">
+			<div class="chat-sidebar">
 
 			</div>
 
-			<form class="chat-input">
+			<div class="chat-content" data-id="">
 
-				<div class="chat-input-text">
-					<textarea placeholder="Enter your message..." require></textarea>
-				</div>
+				<div class="chat-messages"></div>
 
-				<button type="submit">Send</button>
+				<form class="chat-input">
 
-			</form>
+					<div class="chat-input-inner">
+
+						<div class="chat-input-text">
+							<textarea placeholder="Enter your message..." require></textarea>
+						</div>
+
+						<button type="submit">Send</button>
+
+					</div>
+
+				</form>
+
+			</div>
 
 		</div>
 

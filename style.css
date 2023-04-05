@@ -1,7 +1,16 @@
+:root {
+	--body-bg: #202123;
+	--text-input-bg: #56382E;
+	--text-output-bg: grey;
+	--text-output-bg-blink: #B0ACAE;
+	--sidebar-bg: #B0ACAE;
+	--content-bg: #B0ACAE;
+}
 
 body {
 	margin: 0;
 	padding: 0;
+	background-color: var(--body-bg);
 }
 
 .chat-wrapper {
@@ -12,54 +21,89 @@ body {
 
 	.chat {
 		width: 100%;
-		height: 100%;
 		max-width: 1000px;
-		display: flex;
+		padding: 25px 0;
 	}
 
-		.chat-sidebar {
-			width: 25%;
+		.chat-inner {
 			height: 100%;
-			background: red;
+			display: flex;
 		}
 
-		.chat-content {
-			height: 100%;
-			flex-grow: 1;
-			display :flex;
-			flex-direction: column;
-		}
-
-			.chat-messages {
-				flex-grow: 1;
-				background: blue;
-				display: flex;
-				flex-direction: column;
+			.chat-sidebar {
+				width: 25%;
+				height: 100%;
+				background: var(--sidebar-bg);
+				margin: 0 15px 0 0;
+				border-radius: 5px;
 			}
 
-				.chat-messages-item {
-					color: #fff;
-					margin: 10px;
-					padding: 5px 10px;
-				}
-
-				.chat-messages-input { background-color: black; }
-				.chat-messages-output { background-color: grey; }
-
-			.chat-input {
-				height: 10%;
-				background-color: grey;
-				padding: 10px;
+			.chat-content {
+				width: calc(75% - 15px);
+				height: 100%;
+				background: var(--content-bg);
+				border-radius: 5px;
+				position: relative;
 			}
 
-				.chat-input-text {
-					width: 100%;
+				.chat-messages {
+					align-self: flex-start;
+					background: red;
+					overflow-x: hidden;
+					overflow-y: auto;
+					max-height: calc(100% - 100px);
 				}
 
-					.chat-input-text textarea {
-						width: 100%;
-						min-width: 100%;
-						max-width: 100%;
-						height: 25px;
-						border: 0;
+					.chat-messages-item {
+						color: #fff;
+						margin: 10px;
+						padding: 5px 10px;
 					}
+
+					.chat-messages-input { background-color: black; }
+					.chat-messages-output { background-color: var(--text-output-bg); }
+
+					.chat-messages-output-end {
+						-moz-animation:blink normal 3s ease-in-out;		/* Firefox */
+						-webkit-animation:blink normal 3s ease-in-out;	/* Webkit */
+						-ms-animation:blink normal 3s ease-in-out;		/* IE */
+						animation:blink normal 3s ease-in-out;			/* Opera */
+					}
+
+				.chat-input {
+					position: absolute;
+					bottom: 0;
+					width: 100%;
+					height: 10%;
+					background-color: grey;
+
+					align-self: flex-end;
+				}
+
+					.chat-input-inner {
+						padding: 10px;
+					}
+
+						.chat-input-text {
+							width: 100%;
+						}
+
+							.chat-input-text textarea {
+								width: 100%;
+								min-width: 100%;
+								max-width: 100%;
+								height: 25px;
+								border: 0;
+							}
+
+@keyframes blink {
+	0%		{ background-color: var(--text-output-bg);			}
+	50%		{ background-color: var(--text-output-bg-blink);	}
+	100%	{ background-color: var(--text-output-bg);			}
+}
+
+@-webkit-keyframes blink {
+	0%		{ background-color: var(--text-output-bg);			}
+	50%		{ background-color: var(--text-output-bg-blink);	}
+	100%	{ background-color: var(--text-output-bg);			}
+}
