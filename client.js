@@ -33,12 +33,13 @@ $(function() {
 		$content = $form.closest('.chat-content');
 
 		enableInput($content, false);
-		addMessage($content, message, 'input');
+		const $div = addMessage($content, message, 'input');
+		$div.addClass('chat-messages-input-wait');
 
 		autoscroll = true;
 		scrollBottom($content);
 
-		sendMessage($content, message);
+		sendMessage($content, $div, message);
 
 /* // Debug point
 blinkEnd(addMessage($content, message, 'output')); */
@@ -60,7 +61,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function sendMessage($content, message) {
+	function sendMessage($content, $old, message) {
 
 		streaming = true;
 
@@ -90,8 +91,10 @@ blinkEnd(addMessage($content, message, 'output')); */
 				$content.attr('data-id', e.chat_id);
 			}
 
-			const $div = addMessage($content, squareCursor(), 'output');
+			$old.removeClass('chat-messages-input-wait');
+			const $div = addMessage($content, squareCursor(true), 'output');
 			$content.attr('data-status-url', e.response.endpoints.status_url);
+			scrollBottom($content);
 
 			streamMessages($content, $div, e.response.endpoints.stream_events_url);
 
@@ -157,8 +160,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function squareCursor() {
-		return '<span class="chat-cursor">&nbsp;</span>';
+	function squareCursor(blink) {
+		return '<span class="chat-cursor' + (blink ? ' chat-cursor-blink' : '') + '">&nbsp;</span>';
 	}
 
 

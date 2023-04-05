@@ -2,11 +2,13 @@
 
 	--body-bg: #202123;
 
+	--cursor-bg: #fff;
+
 	--text-input-bg: #444554;
 	--text-input-bg-blink: #050509;
 
-	--text-output-bg: grey;
-	--text-output-bg-blink: #74aa9c;
+	--text-output-bg: #343540;
+	--text-output-bg-blink: #B0ACAE;
 
 	--sidebar-bg: #B0ACAE;
 	--content-bg: #B0ACAE;
@@ -78,19 +80,26 @@ body {
 					}
 
 					.chat-messages-output-end {
-						-moz-animation:blink-output normal 3s ease-in-out;		/* Firefox */
-						-webkit-animation:blink-output normal 3s ease-in-out;	/* Webkit */
-						-ms-animation:blink-output normal 3s ease-in-out;		/* IE */
-						animation:blink-output normal 3s ease-in-out;			/* Opera */
+						-moz-animation:blink-output normal 1s ease-in-out;		/* Firefox */
+						-webkit-animation:blink-output normal 1s ease-in-out;	/* Webkit */
+						-ms-animation:blink-output normal 1s ease-in-out;		/* IE */
+						animation:blink-output normal 1s ease-in-out;			/* Opera */
 					}
 
 					.chat-cursor {
-						opacity: .9;
+						opacity: .5;
 						display: inline-block;
 						margin: 0 0 4px 4px;
 						width: 9px; height: 1em;
 						background-color: white;
 						vertical-align: middle;
+					}
+
+					.chat-cursor-blink {
+						-moz-animation:blink-cursor normal 1s infinite ease-in-out;		/* Firefox */
+						-webkit-animation:blink-cursor normal 1s infinite ease-in-out;	/* Webkit */
+						-ms-animation:blink-cursor normal 1s infinite ease-in-out;		/* IE */
+						animation:blink-cursor normal 1s infinite ease-in-out;			/* Opera */
 					}
 
 				.chat-input {
@@ -118,6 +127,17 @@ body {
 							}
 
 
+@keyframes blink-cursor {
+	0%		{ opacity: 1;	}
+	50%		{ opacity: .3;	}
+	100%	{ opacity: 1;	}
+}
+
+@-webkit-keyframes blink-cursor {
+	0%		{ opacity: 1;	}
+	50%		{ opacity: .3;	}
+	100%	{ opacity: 1;	}
+}
 
 @keyframes blink-input {
 	0%		{ background-color: var(--text-input-bg);			}
