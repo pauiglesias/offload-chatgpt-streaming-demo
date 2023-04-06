@@ -5,6 +5,7 @@
 	<title>Offload ChatGPT Streaming Demo</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="./style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
@@ -27,10 +28,12 @@
 					<div class="chat-input-inner">
 
 						<div class="chat-input-text">
-							<textarea placeholder="Enter your message..." require></textarea>
-						</div>
 
-						<button type="submit">Send</button>
+							<textarea rows="1" data-max-rows="5" autofocus require placeholder="Enter your message..."></textarea>
+
+							<button type="submit"><i class="fa-sharp fa-solid fa-paper-plane"></i></button>
+
+						</div>
 
 					</div>
 

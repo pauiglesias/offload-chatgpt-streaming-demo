@@ -9,6 +9,32 @@ $(function() {
 
 
 
+	const inputScrollHeight = $('.chat-input-text textarea')[0].scrollHeight;
+
+
+
+	$('.chat-input-text textarea').keydown(function(e) {
+		const code = e.keyCode ? e.keyCode : e.which;
+		if (13 === code) {
+			userMessage($(this).closest('.chat-input'));
+			return false;
+		}
+
+	}).on('change keyup paste', function() {
+
+		const maxRows = $(this).attr('data-max-rows') || 1;
+
+		/* var minRows = elm.getAttribute('data-min-rows')|0, rows;
+		!elm._baseScrollHeight && getScrollHeight(elm)
+
+		elm.rows = minRows
+		rows = Math.ceil((elm.scrollHeight - elm._baseScrollHeight) / 16)
+		elm.rows = minRows + rows */
+
+	});
+
+
+
 	$('.chat-input').submit(function() {
 		userMessage($(this));
 		return false;
@@ -28,6 +54,8 @@ $(function() {
 		if ('' === message) {
 			return;
 		}
+
+		streaming = true;
 
 		$input.val('');
 		$content = $form.closest('.chat-content');
@@ -62,8 +90,6 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function sendMessage($content, $old, message) {
-
-		streaming = true;
 
 		const chatId = $content.attr('data-id');
 

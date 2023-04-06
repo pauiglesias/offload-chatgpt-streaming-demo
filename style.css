@@ -106,8 +106,7 @@ body {
 					position: absolute;
 					bottom: 0;
 					width: 100%;
-					height: 10%;
-					background-color: grey;
+					height: auto;
 				}
 
 					.chat-input-inner {
@@ -115,15 +114,51 @@ body {
 					}
 
 						.chat-input-text {
-							width: 100%;
+							background-color: #40414e;
+							padding: 15px 10px 15px 10px;
+							border-radius: 5px;
+							display: flex;
+							align-items: flex-end;
+							justify-content: space-between;
 						}
 
 							.chat-input-text textarea {
-								width: 100%;
-								min-width: 100%;
-								max-width: 100%;
-								height: 25px;
-								border: 0;
+
+								color: #fff;
+
+								width: 80%;
+								min-width: 80%;
+								max-width: 80%;
+								/* height: 1em; */
+								min-height: 1em;
+								max-height: 250px;
+
+								border: none;
+								border-style: none;
+								overflow: hidden;
+								outline: none;
+
+								-webkit-box-shadow: none;
+								-moz-box-shadow: none;
+								box-shadow: none;
+
+								resize: none;
+
+								background-color: transparent;
+								overflow: hidden;
+							}
+
+							.chat-input-text button {
+
+								color: #fff;
+								flex-grow: 0;
+								background-color: transparent;
+								opacity: .3;
+
+								border: none;
+								border-style: none;
+								overflow: hidden;
+								outline: none;
 							}
 
 
