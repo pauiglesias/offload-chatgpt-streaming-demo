@@ -115,7 +115,7 @@ body {
 
 						.chat-input-text {
 							background-color: #40414e;
-							padding: 15px 10px 15px 10px;
+							padding: 16px 15px 15px 15px;
 							border-radius: 5px;
 							display: flex;
 							align-items: flex-end;
@@ -126,12 +126,14 @@ body {
 
 								color: #fff;
 
-								width: 80%;
-								min-width: 80%;
-								max-width: 80%;
-								/* height: 1em; */
-								min-height: 1em;
-								max-height: 250px;
+								width: 90%;
+								min-width: 90%;
+								max-width: 90%;
+
+								font-size: 15px;
+
+								min-height: 1.5em;
+								line-height: 1.5em;
 
 								border: none;
 								border-style: none;
@@ -155,11 +157,19 @@ body {
 								background-color: transparent;
 								opacity: .3;
 
+								font-size: 15px;
+								line-height: 1.5em;
+
 								border: none;
 								border-style: none;
 								overflow: hidden;
 								outline: none;
 							}
+
+								.chat-input-text button i {
+									width: 1em;
+									height: 1em;
+								}
 
 
 @keyframes blink-cursor {

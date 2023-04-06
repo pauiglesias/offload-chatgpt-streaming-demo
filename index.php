@@ -29,7 +29,7 @@
 
 						<div class="chat-input-text">
 
-							<textarea rows="1" data-max-rows="5" autofocus require placeholder="Enter your message..."></textarea>
+							<textarea rows="1" data-rows-max="15" autofocus require placeholder="Enter your message..."></textarea>
 
 							<button type="submit"><i class="fa-sharp fa-solid fa-paper-plane"></i></button>
 

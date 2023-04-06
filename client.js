@@ -9,27 +9,31 @@ $(function() {
 
 
 
+	const inputHeight  = $('.chat-input-text textarea').height();
+	const inputRowsMax = parseInt($('.chat-input-text textarea').attr('data-rows-max'), 10) || 25;
 	const inputScrollHeight = $('.chat-input-text textarea')[0].scrollHeight;
 
 
 
-	$('.chat-input-text textarea').keydown(function(e) {
+	$('.chat-input-text textarea').keypress(function(e) {
 		const code = e.keyCode ? e.keyCode : e.which;
 		if (13 === code) {
 			userMessage($(this).closest('.chat-input'));
 			return false;
 		}
 
-	}).on('change keyup paste', function() {
+	}).on('input change keyup paste', function() {
 
-		const maxRows = $(this).attr('data-max-rows') || 1;
+		this.style.height = 0;
 
-		/* var minRows = elm.getAttribute('data-min-rows')|0, rows;
-		!elm._baseScrollHeight && getScrollHeight(elm)
+		const rows = Math.ceil(this.scrollHeight / inputScrollHeight);
+		this.rows = rows > inputRowsMax ? inputRowsMax : rows;
 
-		elm.rows = minRows
-		rows = Math.ceil((elm.scrollHeight - elm._baseScrollHeight) / 16)
-		elm.rows = minRows + rows */
+		let height = 1 === this.rows
+			? inputHeight
+			: (this.rows * inputHeight) - 5;
+
+		$(this).css('height', height + 'px');
 
 	});
 
@@ -63,6 +67,8 @@ $(function() {
 		enableInput($content, false);
 		const $div = addMessage($content, message, 'input');
 		$div.addClass('chat-messages-input-wait');
+
+return;
 
 		autoscroll = true;
 		scrollBottom($content);
