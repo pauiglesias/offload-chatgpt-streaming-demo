@@ -35,6 +35,10 @@ $(function() {
 
 		$(this).css('height', height + 'px');
 
+		'' === $(this).val().trim()
+			? $(this).closest('.chat-input-text').removeClass('chat-input-ready')
+			: $(this).closest('.chat-input-text').addClass('chat-input-ready');
+
 	});
 
 
@@ -62,13 +66,13 @@ $(function() {
 		streaming = true;
 
 		$input.val('');
+		$input.css('height', inputHeight + 'px');
+
 		$content = $form.closest('.chat-content');
 
 		enableInput($content, false);
 		const $div = addMessage($content, message, 'input');
 		$div.addClass('chat-messages-input-wait');
-
-return;
 
 		autoscroll = true;
 		scrollBottom($content);
