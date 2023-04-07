@@ -166,7 +166,7 @@ body {
 								outline: none;
 							}
 
-							.chat-input-ready button { opacity: .55; }
+							.chat-input-ready button { opacity: .7; }
 
 @keyframes blink-cursor {
 	0%		{ opacity: 1;	}

@@ -35,10 +35,7 @@ $(function() {
 
 		$(this).css('height', height + 'px');
 
-		'' === $(this).val().trim()
-			? $(this).closest('.chat-input-text').removeClass('chat-input-ready')
-			: $(this).closest('.chat-input-text').addClass('chat-input-ready');
-
+		readyInputButton($(this));
 	});
 
 
@@ -67,10 +64,11 @@ $(function() {
 
 		$input.val('');
 		$input.css('height', inputHeight + 'px');
+		readyInputButton($input);
 
 		$content = $form.closest('.chat-content');
 
-		enableInput($content, false);
+		enableInputButton($content, false);
 		const $div = addMessage($content, message, 'input');
 		$div.addClass('chat-messages-input-wait');
 
@@ -109,17 +107,21 @@ blinkEnd(addMessage($content, message, 'output')); */
 			status_url	: $content.attr('data-status-url')
 		};
 
+		const $input = $content.find('.chat-input-text textarea');
+
 		$.post('/server.php', data, function(e) {
 
 			if (!e || !e.response || !e.response.status) {
 				streaming = false;
-				enableInput($content, true);
+				readyInputButton($input);
+				enableInputButton($content, true);
 				return;
 			}
 
 			if ('success' != e.response.status) {
 				streaming = false;
-				enableInput($content, true);
+				readyInputButton($input);
+				enableInputButton($content, true);
 				return;
 			}
 
@@ -132,19 +134,20 @@ blinkEnd(addMessage($content, message, 'output')); */
 			$content.attr('data-status-url', e.response.endpoints.status_url);
 			scrollBottom($content);
 
-			streamMessages($content, $div, e.response.endpoints.stream_events_url);
+			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
 		}).fail(function(e) {
 			console.log(e);
 			streaming = false;
-			enableInput($content, true);
+			readyInputButton($input);
+			enableInputButton($content, true);
 		});
 
 	}
 
 
 
-	function streamMessages($content, $div, url) {
+	function streamMessages($content, $div, $input, url) {
 
 		let html = '';
 
@@ -157,7 +160,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 				streaming = false;
 				$div.html(html);
 				blinkEnd($div);
-				enableInput($content, true);
+				readyInputButton($input);
+				enableInputButton($content, true);
 				return;
 			}
 
@@ -182,7 +186,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 			console.log(e);
 			streaming = false;
 			$div.html(html);
-			enableInput($content, true);
+			readyInputButton($input);
+			enableInputButton($content, true);
 			eventSource.close();
 		}
 
@@ -202,9 +207,17 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function enableInput($content, enable) {
+	function enableInputButton($content, enable) {
 		const $button = $content.find('.chat-input button[type="submit"]');
 		enable ? $button.removeAttr('disabled') : $button.attr('disabled', 'disabled');
+	}
+
+
+
+	function readyInputButton($input) {
+		streaming || '' === $input.val().trim()
+			? $input.closest('.chat-input-text').removeClass('chat-input-ready')
+			: $input.closest('.chat-input-text').addClass('chat-input-ready');
 	}
 
 
