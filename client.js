@@ -111,6 +111,10 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		$.post('/server.php', data, function(e) {
 
+			if (!streaming) {
+				return;
+			}
+
 			if (!e || !e.response || !e.response.status) {
 				streaming = false;
 				readyInputButton($input);
@@ -155,17 +159,24 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		eventSource.onmessage = function(e) {
 
-			if (e.data == "[DONE]") {
-				eventSource.close();
-				streaming = false;
-				$div.html(html);
-				blinkEnd($div);
-				readyInputButton($input);
-				enableInputButton($content, true);
+			if (!streaming) {
 				return;
 			}
 
-			let txt = JSON.parse(e.data).choices[0].delta.content;
+			if (!e || !e.data) {
+				streamMessagesEnd($content, $div, $input, eventSource, html);
+				return;
+			}
+
+			if (e.data == "[DONE]") {
+				streamMessagesEnd($content, $div, $input, eventSource, html);
+				return;
+			}
+
+			const obj = JSON.parse(e.data);
+			const choice = 	obj.choices[0];
+
+			let txt = choice.delta.content;
 
 			if (null === txt ||
 				undefined === txt) {
@@ -173,24 +184,34 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			txt = '' + txt;
-			if ('' === txt) {
-				return;
+			if ('' !== txt) {
+				html += prepareOutput(txt);
+				$div.html(html + squareCursor());
+				scrollBottom($content);
 			}
 
-			html += prepareOutput(txt);
-			$div.html(html + squareCursor());
-			scrollBottom($content);
+			if (choice.finish_reason &&
+				'length' == choice.finish_reason) {
+				streamMessagesEnd($content, $div, $input, eventSource, html);
+			}
 		}
 
 		eventSource.onerror = function(e) {
 			console.log(e);
-			streaming = false;
-			$div.html(html);
-			readyInputButton($input);
-			enableInputButton($content, true);
-			eventSource.close();
+			streamMessagesEnd($content, $div, $input, eventSource, html);
 		}
 
+	}
+
+
+
+	function streamMessagesEnd($content, $div, $input, eventSource, html) {
+		streaming = false;
+		eventSource.close();
+		$div.html(html);
+		blinkEnd($div);
+		readyInputButton($input);
+		enableInputButton($content, true);
 	}
 
 
