@@ -243,6 +243,14 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
+	$('.chat-input-text').on('click', function(e) {
+		if (e.target === this) {
+			$(this).find('textarea').focus();
+		}
+	});
+
+
+
 	function blinkEnd($div) {
 		$div.addClass('chat-messages-output-end');
 	}
