@@ -222,7 +222,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	const entityMap = {
+	const htmlEntityMap = {
 		'&': '&amp;',
 		'<': '&lt;',
 		'>': '&gt;',
@@ -235,7 +235,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function escapeHtml(input) {
 		return String(input).replace(/[&<>"'`=\/]/g, function(s) {
-			return entityMap[s];
+			return htmlEntityMap[s];
 		});
 	}
 
