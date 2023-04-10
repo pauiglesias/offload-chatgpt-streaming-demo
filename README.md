@@ -1,7 +1,12 @@
 
 # offload-chatgpt-streaming-demo
 
-Offload chatGPT Streaming Demo
+Offload ChatGPT Streaming Demo
+
+## Instructions
+
+- Copy or rename the config-sample.php file to config.php
+- Fill the constants with your API Keys
 
 # Start with PHP server
 
