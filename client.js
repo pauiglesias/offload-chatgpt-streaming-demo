@@ -283,4 +283,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
+	$(window).resize(function() {
+		$('.chat').each(function() {
+			const height = $(this).find('.chat-content').outerHeight() - $(this).find('.chat-input').height();
+			$(this).find('.chat-messages').height(height > 0 ? height : 0);
+		});
+	}).resize();
+
+
+
 });
