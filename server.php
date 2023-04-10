@@ -1,5 +1,7 @@
 <?php
 
+@require_once __DIR__.'/config.php';
+
 
 
 function postRequest() {
@@ -40,7 +42,6 @@ function streamRequestData($chatId, $message, $statusUrl) {
 
 function remoteRequest($message, $statusUrl = null) {
 
-	readEnv();
 	set_time_limit(60);
 
 	try {
@@ -77,7 +78,7 @@ function remoteRequestOptions($message, $statusUrl) {
 function remoteRequestOptionsArgs($message, $statusUrl) {
 
 	$args = [
-		'api_key'	=> getenv('OPENAI_API_KEY'),
+		'api_key'	=> OPENAI_API_KEY,
 		'messages'	=> json_encode([
 			['role' => 'user', 'content' => $message],
 		]),
@@ -88,49 +89,6 @@ function remoteRequestOptionsArgs($message, $statusUrl) {
 	}
 
 	return $args;
-}
-
-
-
-function readEnv() {
-
-	if (!readEnvTest()) {
-		return;
-	}
-
-	foreach (readEnvLines() as $line) {
-		if ('' !== $line) {
-			readEnvPut($line);
-		}
-	}
-}
-
-
-
-function readEnvTest() {
-
-	static $processed;
-	if (isset($processed)) {
-		return false;
-	}
-
-	$processed = true;
-	return true;
-}
-
-
-
-function readEnvPut($line) {
-	list($name, $value) = array_map('trim', explode('=', $line, 2));
-	if ('' !== $name && '' !== $value) {
-		putenv("$name=$value");
-	}
-}
-
-
-
-function readEnvLines() {
-	return array_map('trim', explode("\n", (string) @file_get_contents(__DIR__.'/.env')));
 }
 
 
