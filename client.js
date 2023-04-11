@@ -53,7 +53,7 @@ $(function() {
 			return;
 		}
 
-		$input = $form.find('textarea');
+		const $input = $form.find('textarea');
 
 		const message = $input.val().trim();
 		if ('' === message) {
