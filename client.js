@@ -69,7 +69,8 @@ $(function() {
 		$content = $form.closest('.chat-content');
 
 		enableInputButton($content, false);
-		const $div = addMessage($content, message, 'input');
+		const input = prepareOutput(escapeHtml(message));
+		const $div = addMessage($content, input, 'input');
 		$div.addClass('chat-messages-input-wait');
 
 		autoscroll = true;
@@ -185,8 +186,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			txt = '' + txt;
 			if ('' !== txt) {
-				html += prepareOutput(txt);
-				$div.html(html + squareCursor());
+				html += escapeHtml(txt);
+				$div.html(prepareOutput(html, squareCursor()));
 				scrollBottom($content);
 			}
 
@@ -208,7 +209,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function streamMessagesEnd($content, $div, $input, eventSource, html) {
 		streaming = false;
 		eventSource.close();
-		$div.html(html);
+		$div.html(prepareOutput(html, ''));
 		blinkEnd($div);
 		readyInputButton($input);
 		enableInputButton($content, true);
@@ -216,8 +217,27 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function prepareOutput(txt) {
-		return escapeHtml(txt).replace(/(?:\r\n|\r|\n)/g, '<br>');
+	function prepareOutput(html, cursor) {
+
+		let input = html.trim();
+		input = input.replace(/(?:\r\n|\r)/g, "\n");
+		input = input.replace(/\n+/, "\n");
+
+		let output = '';
+		const chunks = input.trim().split("\n");
+
+		for (let i = 0; i < chunks.length; i++) {
+
+			output += '<p>' + chunks[i];
+
+			if (i === chunks.length -1) {
+				output += cursor;
+			}
+
+			output += '</p>';
+		}
+
+		return output;
 	}
 
 
