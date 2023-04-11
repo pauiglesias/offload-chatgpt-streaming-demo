@@ -103,6 +103,17 @@ body {
 						animation:blink-cursor normal 1s infinite ease-in-out;			/* Opera */
 					}
 
+				.chat-messages-code {
+					color: #fff;
+					background-color: black;
+					padding: 5px 10px;
+					overflow: auto;
+				}
+
+					.chat-messages-code code {
+						white-space: pre!important;
+					}
+
 				.chat-input {
 					position: absolute;
 					bottom: 0;

@@ -226,15 +226,47 @@ blinkEnd(addMessage($content, message, 'output')); */
 		let output = '';
 		const chunks = input.trim().split("\n");
 
+		let inCode = false;
+		const codeMark = '&#x60;&#x60;&#x60;';
+
 		for (let i = 0; i < chunks.length; i++) {
 
-			output += '<p>' + chunks[i];
+			const addCursor = cursor && i === chunks.length - 1 ? cursor : '';
 
-			if (i === chunks.length -1) {
-				output += cursor;
+			if (codeMark === chunks[i]) {
+				output += inCode ? '</code></div>' : '<div class="chat-messages-code"><code>';
+				output += addCursor;
+				inCode = !inCode;
+				continue;
 			}
 
-			output += '</p>';
+			if (0 === chunks[i].indexOf(codeMark)) {
+
+				const title = chunks[i].substring(codeMark.length);
+
+				if (!inCode) {
+					output += '<div class="chat-messages-code"><code title="' + title + '">';
+					output += addCursor;
+					inCode = !inCode;
+					continue;
+				}
+
+				output += '</code></div>' + '<p>' + title + addCursor + '</p>';
+				inCode = !inCode;
+
+				continue;
+			}
+
+			if (inCode) {
+				output += chunks[i] + addCursor + "\n";
+				continue;
+			}
+
+			output += '<p>' + chunks[i] + addCursor + '</p>';
+		}
+
+		if (inCode) {
+			output += '</code>';
 		}
 
 		return output;
