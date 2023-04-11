@@ -69,7 +69,7 @@ $(function() {
 		$content = $form.closest('.chat-content');
 
 		enableInputButton($content, false);
-		const input = prepareOutput(escapeHtml(message));
+		const input = prepareOutput(escapeHtml(message), '');
 		const $div = addMessage($content, input, 'input');
 		$div.addClass('chat-messages-input-wait');
 
@@ -221,52 +221,116 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		let input = html.trim();
 		input = input.replace(/(?:\r\n|\r)/g, "\n");
-		input = input.replace(/\n+/, "\n");
+		input = input.replace(/\n+/, "\n").trim();
+
+		if ('' === input) {
+			return cursor;
+		}
 
 		let output = '';
-		const chunks = input.trim().split("\n");
+		const chunks = input.split("\n");
 
 		let inCode = false;
 		const codeMark = '&#x60;&#x60;&#x60;';
 
+		let prevLine = '';
+
+		let inListUl = false;
+		let inListOl = false;
+
 		for (let i = 0; i < chunks.length; i++) {
 
-			const addCursor = cursor && i === chunks.length - 1 ? cursor : '';
+			const line = chunks[i];
+			if ('' === line) {
+				continue;
+			}
 
-			if (codeMark === chunks[i]) {
+			const isLast = i === chunks.length - 1;
+			const cursored = isLast ? cursor : '';
+
+			if (codeMark === line) {
 				output += inCode ? '</code></div>' : '<div class="chat-messages-code"><code>';
-				output += addCursor;
+				output += cursored;
 				inCode = !inCode;
 				continue;
 			}
 
-			if (0 === chunks[i].indexOf(codeMark)) {
+			if (0 === line.indexOf(codeMark)) {
 
-				const title = chunks[i].substring(codeMark.length);
+				const title = line.substring(codeMark.length);
 
 				if (!inCode) {
 					output += '<div class="chat-messages-code"><code title="' + title + '">';
-					output += addCursor;
+					output += cursored;
 					inCode = !inCode;
 					continue;
 				}
 
-				output += '</code></div>' + '<p>' + title + addCursor + '</p>';
+				output += '</code></div>' + '<p>' + title + cursored + '</p>';
 				inCode = !inCode;
 
 				continue;
 			}
 
 			if (inCode) {
-				output += chunks[i] + addCursor + "\n";
+				output += line + cursored + "\n";
 				continue;
 			}
 
-			output += '<p>' + chunks[i] + addCursor + '</p>';
+			if (0 === line.indexOf('-')) {
+
+				if (!inListUl) {
+					inListUl = true;
+					output += '<ul>';
+				}
+
+				output += '<li>' + line.substring(1).trim() + cursored + '</li>';
+				continue;
+			}
+
+			if (inListUl) {
+				output += '</ul>';
+				inListUl = false;
+			}
+
+			if (line.match(/^[0-9]+$/)) {
+				if (inListOl) {
+					continue;
+				}
+			}
+
+			if (line.match(/^[0-9]+\./)) {
+
+				if (!inListOl) {
+					inListOl = true;
+					output += '<ol>';
+				}
+
+				const pos = line.indexOf('.');
+				const content = line.substring(pos + 1).trim();
+				output += '<li>' + ('' === content ? '&nbsp;' : content) + cursored + '</li>';
+
+				continue;
+			}
+
+			if (inListOl) {
+				output += '</ol>';
+				inListOl = false;
+			}
+
+			output += '<p>' + prevLine + line + cursored + '</p>';
 		}
 
 		if (inCode) {
 			output += '</code>';
+		}
+
+		if (inListUl) {
+			output += '</ul>';
+		}
+
+		if (inListOl) {
+			output += '</ol>';
 		}
 
 		return output;
