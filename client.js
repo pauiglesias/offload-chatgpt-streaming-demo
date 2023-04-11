@@ -103,6 +103,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 		const chatId = $content.attr('data-chat-id');
 
 		const data = {
+			action		: 'stream',
 			chat_id		: chatId,
 			message		: message,
 			status_url	: $content.attr('data-status-url')
@@ -130,7 +131,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
+			let newChat = false;
 			if (!chatId) {
+				newChat = true;
 				$content.attr('data-chat-id', e.chat_id);
 			}
 
@@ -143,7 +146,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
-			saveChat($content);
+			saveChat($content, message, newChat);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -431,16 +434,27 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function saveChat($content) {
+	function saveChat($content, message, newChat) {
 
 		const data = {
 			action		: 'save',
+			message		: message,
 			chat_id		: $content.attr('data-chat-id'),
 			status_url	: $content.attr('data-status-url')
 		};
 
 		$.post('/server.php', data, function(e) {
-			console.log(e);
+
+			if (!e || !e.chat_id) {
+				return;
+			}
+
+			if (!newChat || !e.title) {
+				return;
+			}
+
+
+
 		});
 
 	}
