@@ -24,7 +24,7 @@
 
 				</div>
 
-				<div class="chat-content" data-id="">
+				<div class="chat-content">
 
 					<div class="chat-messages"></div>
 

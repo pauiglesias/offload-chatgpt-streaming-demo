@@ -100,7 +100,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function sendMessage($content, $old, message) {
 
-		const chatId = $content.attr('data-id');
+		const chatId = $content.attr('data-chat-id');
 
 		const data = {
 			chat_id		: chatId,
@@ -131,15 +131,19 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			if (!chatId) {
-				$content.attr('data-id', e.chat_id);
+				$content.attr('data-chat-id', chatId);
 			}
+
+			statusUrl = e.response.endpoints.status_url;
 
 			$old.removeClass('chat-messages-input-wait');
 			const $div = addMessage($content, squareCursor(true), 'output');
-			$content.attr('data-status-url', e.response.endpoints.status_url);
+			$content.attr('data-status-url', statusUrl);
 			scrollBottom($content);
 
 			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
+
+			saveChat($content);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -424,6 +428,21 @@ blinkEnd(addMessage($content, message, 'output')); */
 			$(this).find('.chat-messages').height(height > 0 ? height : 0);
 		});
 	}).resize();
+
+
+
+	function saveChat($content) {
+
+		const data = {
+			action		: 'save',
+			chat_id		: $content.attr('data-chat-id'),
+			status_url	: $content.attr('data-status-url')
+		};
+
+		$.post('/server.php', data, function(e) {
+		});
+
+	}
 
 
 

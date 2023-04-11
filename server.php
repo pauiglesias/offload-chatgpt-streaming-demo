@@ -4,11 +4,40 @@
 
 
 
+function checkUser() {
+
+	global $userId;
+
+	if (!empty($_COOKIE['user_id'])) {
+		$userId = $_COOKIE['user_id'];
+		return;
+	}
+
+	$userId = uniqid();
+
+	setCookie(
+		'user_id',
+		$userId,
+		time() + (10 * 365 * 24 * 60 * 60)
+	);
+}
+
+
+
+
 function postRequest() {
 
 	if (!empty($_POST['message'])) {
 		streamRequest();
 		return;
+	}
+
+	if (empty($_POST['action'])) {
+		return;
+	}
+
+	if ('save' == $_POST['action']) {
+		saveChat();
 	}
 }
 
@@ -93,4 +122,55 @@ function remoteRequestOptionsArgs($message, $statusUrl) {
 
 
 
+function saveChat() {
+	$chatId 	= empty($_POST['chat_id'])		? null : $_POST['chat_id'];
+	$statusUrl 	= empty($_POST['status_url'])	? null : $_POST['status_url'];
+	saveChatResponse($chatId, $statusUrl);
+}
+
+
+
+function saveChatResponse($chatId, $statusUrl) {
+	header('Content-Type: application/json');
+	echo json_encode(saveChatData($chatId, $statusUrl));
+	die;
+}
+
+
+
+function saveChatData($chatId, $statusUrl) {
+
+	if (empty($chatId) || empty($statusUrl)) {
+		return null;
+	}
+
+	$data = loadUserData();
+	$data[$chatId] = $statusUrl;
+	return saveUserData($data);
+}
+
+
+
+function loadUserData() {
+	$data = @json_decode(@file_get_contents(userDataPath()), true);
+	return empty($data) || !is_array($data) ? [] : $data;
+}
+
+
+
+function saveUserData($data) {
+	$json = @json_encode($data, JSON_UNESCAPED_SLASHES);
+	return empty($json) ? 0 : @file_put_contents(userDataPath(), $json);
+}
+
+
+
+function userDataPath() {
+	global $userId;
+	return __DIR__.'/data/'.$userId.'.json';
+}
+
+
+
+checkUser();
 postRequest();
