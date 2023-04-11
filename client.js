@@ -453,7 +453,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-
+			$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
+			$list.prepend('<p>' + escapeHtml(e.title)) + '</p>';
 
 		});
 

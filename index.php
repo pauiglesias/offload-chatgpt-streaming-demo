@@ -22,6 +22,10 @@
 
 				<div class="chat-sidebar">
 
+					<div class="chat-sidebar-new">New Chat</div>
+
+					<div class="chat-sidebar-list"></div>
+
 				</div>
 
 				<div class="chat-content">
