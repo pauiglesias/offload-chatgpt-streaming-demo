@@ -131,7 +131,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			if (!chatId) {
-				$content.attr('data-chat-id', chatId);
+				$content.attr('data-chat-id', e.chat_id);
 			}
 
 			statusUrl = e.response.endpoints.status_url;
@@ -440,6 +440,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 		};
 
 		$.post('/server.php', data, function(e) {
+			console.log(e);
 		});
 
 	}
