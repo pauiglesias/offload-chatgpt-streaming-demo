@@ -25,6 +25,11 @@ function postRequest() {
 		return;
 	}
 
+	if ('chats' == $_POST['action']) {
+		chats();
+		return;
+	}
+
 }
 
 
@@ -214,6 +219,8 @@ function updateChatTitleData($chatId, $title) {
 		return null;
 	}
 
+	$title = prepareChatTitle($title);
+
 	if (empty($title)) {
 		$title = chatTitleFallback($data[$chatId]['prompt']);
 		if (empty($title)) {
@@ -276,6 +283,69 @@ function chatTitleFallback($message) {
 	}
 
 	return implode(' ', $output);
+}
+
+
+
+/**
+ * User chat list
+ */
+
+
+
+function chats() {
+	header('Content-Type: application/json');
+	echo json_encode(chatsData());
+	die;
+}
+
+
+
+function chatsData() {
+	$data = loadUserData();
+	return empty($data) ? null : ['chats' => chatsDataItems($data)];
+}
+
+
+
+function chatsDataItems($data) {
+
+	$items = [];
+
+	foreach ($data as $chatId => $info) {
+
+		if (empty($chatId) ||
+			empty($info['title'])) {
+			continue;
+		}
+
+		$title = prepareChatTitle($info['title']);
+		if ('' === $title) {
+			continue;
+		}
+
+		$items[] = [
+			'chat_id'	=> $chatId,
+			'title'		=> $title,
+		];
+	}
+
+	return array_reverse($items);
+}
+
+
+
+function prepareChatTitle($title) {
+	$title = trim($title);
+	$title = trim($title, '"');
+	$title = trim($title);
+	$title = trim($title, "'");
+	$title = trim($title);
+	$title = trim($title, '"');
+	$title = trim($title);
+	$title = trim($title, "'");
+	$title = trim($title);
+	return $title;
 }
 
 

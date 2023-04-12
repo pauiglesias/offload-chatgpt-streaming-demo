@@ -450,7 +450,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			if (e.title) {
-				prependChat($content, data.chat_id, e.title);
+				addChatList($content.closest('.chat'), data.chat_id, e.title, true);
 				return;
 			}
 
@@ -472,20 +472,18 @@ blinkEnd(addMessage($content, message, 'output')); */
 		};
 
 		$.post('/server.php', data, function(e) {
-
-			if (!e || !e.title) {
-				return;
+			if (e && e.title) {
+				addChatList($content.closest('.chat'), chatId, e.title, true);
 			}
-
-			prependChat($content, chatId, e.title);
 		});
 	}
 
 
 
-	function prependChat($content, chatId, title) {
-		$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
-		$list.prepend('<div class="chat-sidebar-item" data-chat-id="' + chatId + '">' + escapeHtml(title)) + '</div>';
+	function addChatList($chat, chatId, title, prepend) {
+		const $list = $chat.find('.chat-sidebar .chat-sidebar-list');
+		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '">' + escapeHtml(title)) + '</div>';
+		prepend ? $list.prepend(html) : $list.append(html);
 	}
 
 
@@ -522,6 +520,37 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		});
 	}
+
+
+
+	function chats() {
+
+		$('.chat').each(function() {
+
+			const $chat = $(this);
+			$chat.find('.chat-sidebar-list').addClass('chat-sidebar-list-loading');
+
+			$.post('/server.php', { action: 'chats' }, function(e) {
+
+				$chat.find('.chat-sidebar-list').removeClass('chat-sidebar-list-loading');
+
+				if (!e || !e.chats || !e.chats.length) {
+					return;
+				}
+
+				for (item of e.chats) {
+					addChatList($chat, item.chat_id, item.title, false);
+				}
+
+			});
+
+		});
+
+	}
+
+
+
+	chats();
 
 
 
