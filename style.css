@@ -114,6 +114,20 @@ body {
 						white-space: pre!important;
 					}
 
+
+				.chat-chatgpt-logo-template {
+					display: none;
+				}
+
+					.chat-chatgpt-logo {
+						padding: 5px;
+						width: 30px; height: 30px;
+						display: inline-block;
+						color: #fff;
+						background: #00a380;
+						border-radius: 5px;
+					}
+
 				.chat-input {
 					position: absolute;
 					bottom: 0;
