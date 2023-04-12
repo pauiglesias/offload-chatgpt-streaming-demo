@@ -263,7 +263,7 @@ function chatTitleRequest($message) {
 
 	$args = [
 		'messages'  => json_encode([
-			['role' => 'system', 'content' => 'Summarize the following user text in 3 to 5 words in the same language: "'.$message.'"'],
+			['role' => 'system', 'content' => 'Summarize the following user text in 3 to 5 words in the same language: "'.str_replace('"', '', $message).'"'],
 		]),
 	];
 
