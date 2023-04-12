@@ -117,6 +117,11 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
+			if (chatId != $content.attr('data-chat-id')) {
+				streaming = false;
+				return;
+			}
+
 			if (!e || !e.response || !e.response.status) {
 				streaming = false;
 				readyInputButton($input);
@@ -141,8 +146,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			$old.removeClass('chat-messages-input-wait');
 			const $div = addMessage($content, squareCursor(true), 'output');
-			$content.attr('data-status-url', statusUrl);
 			scrollBottom($content);
+
+			$content.attr('data-status-url', statusUrl);
+
+			if (chatId) {
+				$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').attr('data-status-url', statusUrl);
+			}
 
 			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
@@ -483,7 +493,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function addChatList($chat, chatId, title, statusUrl, prepend) {
 		const $list = $chat.find('.chat-sidebar .chat-sidebar-list');
 		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '" data-status-url="' + statusUrl + '">' + escapeHtml(title)) + '</div>';
-		prepend ? $list.prepend(html) : $list.append(html);
+		prepend ? $list.prepend(html) && $list.scrollTop(0) : $list.append(html);
 	}
 
 
@@ -524,20 +534,87 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	$(document).on('click', '.chat-sidebar-new', function() {
-
 		streaming = false;
-
 		const $content = $(this).closest('.chat').find('.chat-content');
+		resetChatMessages($content);
+		resetChatInput($content);
+		return false;
+	});
+
+
+	$(document).on('click', '.chat-sidebar-item', function() {
+		streaming = false;
+		const $content = $(this).closest('.chat').find('.chat-content');
+		resetChatMessages($content);
+		resetChatInput($content);
+		loadChat($content, $(this).attr('data-chat-id'), $(this).attr('data-status-url'));
+		return false;
+	});
+
+
+
+	function resetChatMessages($content) {
 		$content.find('.chat-messages').html('');
 		$content.removeAttr('data-chat-id').removeAttr('data-status-url');
 		enableInputButton($content, false);
+	}
 
+
+
+	function resetChatInput($content) {
 		$input = $content.find('.chat-input textarea');
 		$input.val('').focus();
 		readyInputButton($input);
+	}
 
-		return false;
-	});
+
+
+	function loadChat($content, chatId, statusUrl) {
+
+		$content.attr('data-chat-id', chatId);
+		$content.attr('data-status-url', statusUrl);
+
+		$.get(statusUrl, function(e) {
+
+			if (chatId != $content.attr('data-chat-id') ||
+				statusUrl != $content.attr('data-status-url')) {
+				return;
+			}
+
+			if (!e || !e.status || 'done' != e.status) {
+				return;
+			}
+
+			if (!e.parameters ||
+				!e.parameters.messages ||
+				!e.parameters.messages.length) {
+				return;
+			}
+
+			for (const message of e.parameters.messages) {
+
+				if (!message.role || !message.content ||
+					!['user', 'assistant'].includes(message.role)) {
+					continue;
+				}
+
+				const input = prepareOutput(escapeHtml(message.content), '');
+
+				addMessage($content, input, 'user' == message.role ? 'input' : 'output');
+			}
+
+			if (e.response &&
+				e.response.body &&
+				e.response.body.choices &&
+				e.response.body.choices[0].message &&
+				e.response.body.choices[0].message.content) {
+
+				const output = prepareOutput(escapeHtml(e.response.body.choices[0].message.content), '');
+				addMessage($content, output, 'output');
+			}
+
+		});
+	}
 
 
 
