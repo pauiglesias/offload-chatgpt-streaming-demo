@@ -438,6 +438,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 	$(window).resize(function() {
 		$('.chat').each(function() {
 			const height = $(this).find('.chat-content').outerHeight() - $(this).find('.chat-input').height();
+			$(this).find('.chat-loading').height(height > 0 ? height : 0);
 			$(this).find('.chat-messages').height(height > 0 ? height : 0);
 		});
 	}).resize();
@@ -547,17 +548,20 @@ blinkEnd(addMessage($content, message, 'output')); */
 	});
 
 
+
 	$(document).on('click', '.chat-sidebar-item', function() {
 
 		streaming = false;
 
 		const $content = $(this).closest('.chat').find('.chat-content');
-		resetChatMessages($content);
 		resetChatInput($content);
 
 		$(this).closest('.chat-sidebar-list').find('.chat-sidebar-item').removeClass('chat-sidebar-selected').removeClass('chat-sidebar-loading');
 		$(this).addClass('chat-sidebar-loading');
 
+		$content.addClass('chat-content-loading');
+
+		enableInputButton($content, false);
 		loadChat($content, $(this).attr('data-chat-id'), $(this).attr('data-status-url'));
 
 		return false;
@@ -590,18 +594,23 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			if (chatId != $content.attr('data-chat-id') ||
 				statusUrl != $content.attr('data-status-url')) {
+				$content.removeClass('chat-content-loading');
 				return;
 			}
 
 			if (!e || !e.status || 'done' != e.status) {
+				$content.removeClass('chat-content-loading');
 				return;
 			}
 
 			if (!e.parameters ||
 				!e.parameters.messages ||
 				!e.parameters.messages.length) {
+				$content.removeClass('chat-content-loading');
 				return;
 			}
+
+			$content.find('.chat-messages').html('');
 
 			for (const message of e.parameters.messages) {
 
@@ -625,6 +634,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 				addMessage($content, output, 'output');
 			}
 
+			$content.removeClass('chat-content-loading');
 			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
 
 		});
