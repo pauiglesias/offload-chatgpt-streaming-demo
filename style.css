@@ -213,6 +213,8 @@ body {
 							background-color: black;
 							padding: 5px 10px;
 							overflow: auto;
+							font-family: 'Courier New', Courier, monospace;
+							font-size: 13px;
 						}
 
 							.chat-messages-code code {
