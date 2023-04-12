@@ -161,8 +161,10 @@ function saveChatData($chatId, $message, $statusUrl) {
 	if (!isset($data[$chatId])) {
 
 		$data[$chatId] = [
-			'title'  => null,
-			'prompt' => $message,
+			'title'		=> null,
+			'created'	=> time(),
+			'updated'	=> time(),
+			'prompt'	=> $message,
 		];
 
 		$titleStatusUrl = chatTitleStatusUrl($message);
@@ -171,6 +173,7 @@ function saveChatData($chatId, $message, $statusUrl) {
 		}
 	}
 
+	$data[$chatId]['updated'] = time();
 	$data[$chatId]['status_url'] = $statusUrl;
 
 	if (!saveUserData($data)) {
