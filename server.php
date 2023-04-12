@@ -315,7 +315,8 @@ function chatsDataItems($data) {
 	foreach ($data as $chatId => $info) {
 
 		if (empty($chatId) ||
-			empty($info['title'])) {
+			empty($info['title']) ||
+			empty($info['status_url'])) {
 			continue;
 		}
 
@@ -325,8 +326,9 @@ function chatsDataItems($data) {
 		}
 
 		$items[] = [
-			'chat_id'	=> $chatId,
-			'title'		=> $title,
+			'chat_id'		=> $chatId,
+			'title'			=> $title,
+			'status_url'	=> $info['status_url']
 		];
 	}
 
@@ -336,15 +338,27 @@ function chatsDataItems($data) {
 
 
 function prepareChatTitle($title) {
-	$title = trim($title);
-	$title = trim($title, '"');
-	$title = trim($title);
-	$title = trim($title, "'");
-	$title = trim($title);
-	$title = trim($title, '"');
-	$title = trim($title);
-	$title = trim($title, "'");
-	$title = trim($title);
+
+	$chars = [
+		null,
+		'"',
+		null,
+		"'",
+		null,
+		'"',
+		null,
+		"'",
+		'.',
+		':',
+		'.',
+		':',
+		'.',
+	];
+
+	foreach ($chars as $char) {
+		$title = isset($char) ? trim($title, $char) : trim($title);
+	}
+
 	return $title;
 }
 

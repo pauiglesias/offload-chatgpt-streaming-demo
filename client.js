@@ -450,12 +450,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			if (e.title) {
-				addChatList($content.closest('.chat'), data.chat_id, e.title, true);
+				addChatList($content.closest('.chat'), data.chat_id, e.title, data.status_url, true);
 				return;
 			}
 
 			if (e.title_status_url) {
-				waitForChatTitleUrl($content, data.chat_id, e.title_status_url);
+				waitForChatTitleUrl($content, data.chat_id, data.status_url, e.title_status_url);
 			}
 
 		});
@@ -463,7 +463,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function updateChatTitle($content, chatId, title) {
+	function updateChatTitle($content, chatId, statusUrl, title) {
 
 		const data = {
 			action		: 'title',
@@ -473,38 +473,38 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		$.post('/server.php', data, function(e) {
 			if (e && e.title) {
-				addChatList($content.closest('.chat'), chatId, e.title, true);
+				addChatList($content.closest('.chat'), chatId, e.title, statusUrl, true);
 			}
 		});
 	}
 
 
 
-	function addChatList($chat, chatId, title, prepend) {
+	function addChatList($chat, chatId, title, statusUrl, prepend) {
 		const $list = $chat.find('.chat-sidebar .chat-sidebar-list');
-		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '">' + escapeHtml(title)) + '</div>';
+		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '" data-status-url="' + statusUrl + '">' + escapeHtml(title)) + '</div>';
 		prepend ? $list.prepend(html) : $list.append(html);
 	}
 
 
 
-	function waitForChatTitleUrl($content, chatId, titleStatusUrl) {
-		setTimeout(fetchTitleUrl, 1000, $content, chatId, titleStatusUrl);
+	function waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl) {
+		setTimeout(fetchTitleUrl, 1000, $content, chatId, statusUrl, titleStatusUrl);
 	}
 
 
 
-	function fetchTitleUrl($content, chatId, titleStatusUrl) {
+	function fetchTitleUrl($content, chatId, statusUrl, titleStatusUrl) {
 
 		$.get(titleStatusUrl, function(e) {
 
 			if (!e || !e.status || 'error' == e.status) {
-				updateChatTitle($content, chatId, null);
+				updateChatTitle($content, chatId, statusUrl, null);
 				return;
 			}
 
 			if ('done' != e.status) {
-				waitForChatTitleUrl($content, chatId, titleStatusUrl);
+				waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl);
 				return;
 			}
 
@@ -513,10 +513,10 @@ blinkEnd(addMessage($content, message, 'output')); */
 				!e.response.body.choices ||
 				!e.response.body.choices[0].message ||
 				!e.response.body.choices[0].message.content) {
-				updateChatTitle($content, chatId, null);
+				updateChatTitle($content, chatId, statusUrl, null);
 			}
 
-			updateChatTitle($content, chatId, e.response.body.choices[0].message.content);
+			updateChatTitle($content, chatId, statusUrl, e.response.body.choices[0].message.content);
 
 		});
 	}
@@ -557,7 +557,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 				}
 
 				for (item of e.chats) {
-					addChatList($chat, item.chat_id, item.title, false);
+					addChatList($chat, item.chat_id, item.title, item.status_url, false);
 				}
 
 			});
