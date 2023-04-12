@@ -523,6 +523,24 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
+	$(document).on('click', '.chat-sidebar-new', function() {
+
+		streaming = false;
+
+		const $content = $(this).closest('.chat').find('.chat-content');
+		$content.find('.chat-messages').html('');
+		$content.removeAttr('data-chat-id').removeAttr('data-status-url');
+		enableInputButton($content, false);
+
+		$input = $content.find('.chat-input textarea');
+		$input.val('').focus();
+		readyInputButton($input);
+
+		return false;
+	});
+
+
+
 	function chats() {
 
 		$('.chat').each(function() {
