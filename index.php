@@ -35,7 +35,7 @@
 
 					<div class="chat-messages"></div>
 
-					<div class="chat-loading"><span></span><div></div></div>
+					<div class="chat-loading"><span></span></div>
 
 					<form class="chat-input">
 

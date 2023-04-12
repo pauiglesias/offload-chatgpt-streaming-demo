@@ -485,6 +485,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 		$.post('/server.php', data, function(e) {
 			if (e && e.title) {
 				addChatList($content.closest('.chat'), chatId, e.title, statusUrl, true);
+				$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').addClass('chat-sidebar-selected');
 			}
 		});
 	}
