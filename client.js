@@ -85,7 +85,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function addMessage($content, message, type) {
-		const html = '<div class="chat-messages-item chat-messages-' + type + '"><div class="chat-messages-text">' + message + '</div></div>';
+		const html = '<div class="chat-messages-item chat-messages-' + type + '"><div class="chat-messages-icon"></div><div class="chat-messages-text">' + message + '</div></div>';
 		$content.find('.chat-messages').append(html);
 		return lastMessage($content);
 	}
@@ -194,7 +194,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			txt = '' + txt;
 			if ('' !== txt) {
 				html += escapeHtml(txt);
-				$div.html(prepareOutput(html, squareCursor()));
+				$div.find('.chat-messages-text').html(prepareOutput(html, squareCursor()));
 				scrollBottom($content);
 			}
 
@@ -216,7 +216,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function streamMessagesEnd($content, $div, $input, eventSource, html) {
 		streaming = false;
 		eventSource.close();
-		$div.html(prepareOutput(html, ''));
+		$div.find('.chat-messages-text').html(prepareOutput(html, ''));
 		blinkEnd($div);
 		readyInputButton($input);
 		enableInputButton($content, true);
