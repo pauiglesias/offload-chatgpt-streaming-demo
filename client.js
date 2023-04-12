@@ -479,13 +479,15 @@ blinkEnd(addMessage($content, message, 'output')); */
 		const data = {
 			action		: 'title',
 			chat_id		: chatId,
-			title		: title,
+			title		: title
 		};
 
 		$.post('/server.php', data, function(e) {
 			if (e && e.title) {
 				addChatList($content.closest('.chat'), chatId, e.title, statusUrl, true);
-				$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').addClass('chat-sidebar-selected');
+				$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
+				$list.find('.chat-sidebar-item[data-chat-id="' + chatId + '"]').addClass('chat-sidebar-selected');
+				$list.scrollTop(0);
 			}
 		});
 	}
@@ -494,7 +496,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function addChatList($chat, chatId, title, statusUrl, prepend) {
 		const $list = $chat.find('.chat-sidebar .chat-sidebar-list');
-		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '" data-status-url="' + statusUrl + '">' + escapeHtml(title)) + '</div>';
+		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '" data-status-url="' + statusUrl + '">' + escapeHtml(title)) + '<span></span></div>';
 		prepend ? $list.prepend(html) && $list.scrollTop(0) : $list.append(html);
 	}
 
@@ -564,6 +566,26 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		enableInputButton($content, false);
 		loadChat($content, $(this).attr('data-chat-id'), $(this).attr('data-status-url'));
+
+		return false;
+	});
+
+
+
+	$(document).on('click', '.chat-sidebar-item span', function(e) {
+
+		e.stopPropagation();
+
+		streaming = false;
+
+		const $content = $(this).closest('.chat').find('.chat-content');
+		resetChatMessages($content);
+		resetChatInput($content);
+
+		const $item = $(this).closest('.chat-sidebar-item');
+		const chatId = $item.attr('data-chat-id');
+		$item.remove();
+		removeChat(chatId);
 
 		return false;
 	});
@@ -640,6 +662,18 @@ blinkEnd(addMessage($content, message, 'output')); */
 			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
 
 		});
+	}
+
+
+
+	function removeChat(chatId) {
+
+		const data = {
+			action	: 'remove',
+			chat_id	: chatId
+		};
+
+		$.post('/server.php', data);
 	}
 
 

@@ -25,6 +25,11 @@ function postRequest() {
 		return;
 	}
 
+	if ('remove' == $_POST['action']) {
+		removeChat();
+		return;
+	}
+
 	if ('chats' == $_POST['action']) {
 		chats();
 		return;
@@ -286,6 +291,48 @@ function chatTitleFallback($message) {
 	}
 
 	return implode(' ', $output);
+}
+
+
+
+/**
+ * Remove chat
+ */
+
+
+
+function removeChat() {
+	$chatId = empty($_POST['chat_id'])	? null : $_POST['chat_id'];
+	removeChatResponse($chatId);
+}
+
+
+
+function removeChatResponse($chatId) {
+	header('Content-Type: application/json');
+	echo json_encode(removeChatData($chatId));
+	die;
+}
+
+
+
+function removeChatData($chatId) {
+
+	if (empty($chatId)) {
+		return null;
+	}
+
+	$data = loadUserData();
+	if (!isset($data[$chatId])) {
+		return 0;
+	}
+
+	unset($data[$chatId]);
+	if (!saveUserData($data)) {
+		return null;
+	}
+
+	return 1;
 }
 
 
