@@ -459,7 +459,6 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 		});
-
 	}
 
 
@@ -479,7 +478,6 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			prependChat($content, chatId, e.title);
-
 		});
 	}
 
