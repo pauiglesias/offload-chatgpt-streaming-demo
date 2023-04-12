@@ -24,8 +24,7 @@ body {
 }
 
 .chat-wrapper {
-	margin-top: 15px;
-	height: calc(100vh - 60px);
+	height: calc(100vh - 30px);
 	display: flex;
 	justify-content: center;
 }
@@ -38,7 +37,7 @@ body {
 		.chat-inner {
 			height: 100%;
 			display: flex;
-			padding: 15px;
+			padding: 5px;
 			background-color: var(--chat-bg);
 			border-radius: 3px;
 		}
@@ -83,7 +82,7 @@ body {
 						position: relative;
 						font-size: 15px;
 						padding: 10px 5px 10px 27px;
-						margin: 0;
+						margin: 0 7px 0;
 						color: #fff;
 						text-align: left;
 						cursor: pointer;
