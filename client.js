@@ -611,6 +611,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			$content.find('.chat-messages').html('');
+			$content.find('.chat-messages').scrollTop(0);
 
 			for (const message of e.parameters.messages) {
 
