@@ -493,7 +493,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function waitForChatTitleUrl($content, chatId, titleStatusUrl) {
-		setTimeout(fetchTitleUrl, 3000, $content, chatId, titleStatusUrl);
+		setTimeout(fetchTitleUrl, 1000, $content, chatId, titleStatusUrl);
 	}
 
 
