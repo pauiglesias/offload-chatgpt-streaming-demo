@@ -521,6 +521,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			updateChatTitle($content, chatId, e.response.body.choices[0].message.content);
+
 		});
 	}
 
