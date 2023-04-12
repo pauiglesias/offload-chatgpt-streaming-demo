@@ -11,7 +11,7 @@
 	--text-output-bg: #444653;
 	--text-output-bg-blink: #B0ACAE;
 
-	--sidebar-bg: #B0ACAE;
+	--sidebar-bg: #000000;
 	--content-bg: #B0ACAE;
 }
 
@@ -19,6 +19,8 @@ body {
 	margin: 0;
 	padding: 0;
 	background-color: var(--body-bg);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	font-size: 16px;
 }
 
 .chat-wrapper {
@@ -45,8 +47,32 @@ body {
 				width: 25%;
 				background: var(--sidebar-bg);
 				margin: 0 15px 0 0;
+				padding: 5px;
 				border-radius: 5px;
+				display: flex;
+				flex-direction: column;
 			}
+
+				.chat-sidebar-new {
+					padding: 5px;
+					margin: 0 0 10px;
+					color: #fff;
+					border: 1px solid #4d4d4f;
+					text-align: center;
+					cursor: pointer;
+				}
+
+				.chat-sidebar-list {
+					height: calc(100% - 50px);
+				}
+
+					.chat-sidebar-item {
+						padding: 5px;
+						margin: 0 0 10px;
+						color: #fff;
+						text-align: left;
+						cursor: pointer;
+					}
 
 			.chat-content {
 				width: calc(75% - 15px);
@@ -71,7 +97,7 @@ body {
 						padding: 10px 10px 0 12px;
 						border-radius: 3px;
 						min-height: 50px;
-						line-height: 1.5em;
+						line-height: 1.7em;
 						display: flex;
 						align-items: flex-start;
 						justify-content: flex-start;
