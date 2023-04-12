@@ -445,19 +445,83 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		$.post('/server.php', data, function(e) {
 
-			if (!e || !e.chat_id) {
+			if (!e || !newChat) {
 				return;
 			}
 
-			if (!newChat || !e.title) {
+			if (e.title) {
+				prependChat($content, data.chat_id, e.title);
 				return;
 			}
 
-			$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
-			$list.prepend('<p>' + escapeHtml(e.title)) + '</p>';
+			if (e.title_status_url) {
+				waitForChatTitleUrl($content, data.chat_id, e.title_status_url);
+			}
 
 		});
 
+	}
+
+
+
+	function updateChatTitle($content, chatId, title) {
+
+		const data = {
+			action		: 'title',
+			chat_id		: chatId,
+			title		: title,
+		};
+
+		$.post('/server.php', data, function(e) {
+
+			if (!e || !e.title) {
+				return;
+			}
+
+			prependChat($content, chatId, e.title);
+
+		});
+	}
+
+
+
+	function prependChat($content, chatId, title) {
+		$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
+		$list.prepend('<div class="chat-sidebar-item" data-chat-id="' + chatId + '">' + escapeHtml(title)) + '</div>';
+	}
+
+
+
+	function waitForChatTitleUrl($content, chatId, titleStatusUrl) {
+		setTimeout(fetchTitleUrl, 3000, $content, chatId, titleStatusUrl);
+	}
+
+
+
+	function fetchTitleUrl($content, chatId, titleStatusUrl) {
+
+		$.get(titleStatusUrl, function(e) {
+
+			if (!e || !e.status || 'error' == e.status) {
+				updateChatTitle($content, chatId, null);
+				return;
+			}
+
+			if ('done' != e.status) {
+				waitForChatTitleUrl($content, chatId, titleStatusUrl);
+				return;
+			}
+
+			if (!e.response ||
+				!e.response.body ||
+				!e.response.body.choices ||
+				!e.response.body.choices[0].message ||
+				!e.response.body.choices[0].message.content) {
+				updateChatTitle($content, chatId, null);
+			}
+
+			updateChatTitle($content, chatId, e.response.body.choices[0].message.content);
+		});
 	}
 
 

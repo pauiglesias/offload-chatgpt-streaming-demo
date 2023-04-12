@@ -4,26 +4,6 @@
 
 
 
-function checkUser() {
-
-	global $userId;
-
-	if (!empty($_COOKIE['user_id'])) {
-		$userId = $_COOKIE['user_id'];
-		return;
-	}
-
-	$userId = uniqid();
-
-	setCookie(
-		'user_id',
-		$userId,
-		time() + (10 * 365 * 24 * 60 * 60)
-	);
-}
-
-
-
 function postRequest() {
 
 	if (empty($_POST['action'])) {
@@ -39,7 +19,19 @@ function postRequest() {
 		saveChat();
 		return;
 	}
+
+	if ('title' == $_POST['action']) {
+		updateChatTitle();
+		return;
+	}
+
 }
+
+
+
+/**
+ * Streaming
+ */
 
 
 
@@ -77,6 +69,12 @@ function streamRequestData($chatId, $message, $statusUrl) {
 		'response' => remoteRequest($args, '/stream-chatgpt'),
 	];
 }
+
+
+
+/**
+ * Remote requests
+ */
 
 
 
@@ -122,6 +120,12 @@ function remoteRequestOptionsArgs($args = []) {
 
 
 
+/**
+ * Save or update chat
+ */
+
+
+
 function saveChat() {
 	$chatId 	= empty($_POST['chat_id'])		? null : $_POST['chat_id'];
 	$message	= empty($_POST['message'])		? null : $_POST['message'];
@@ -147,8 +151,19 @@ function saveChatData($chatId, $message, $statusUrl) {
 
 	$data = loadUserData();
 
+	$titleStatusUrl = null;
+
 	if (!isset($data[$chatId])) {
-		$data[$chatId] = ['title' => chatTitle($message)];
+
+		$data[$chatId] = [
+			'title'  => null,
+			'prompt' => $message,
+		];
+
+		$titleStatusUrl = chatTitleStatusUrl($message);
+		if (empty($titleStatusUrl)) {
+			$data[$chatId]['title'] = chatTitleFallback($message);
+		}
 	}
 
 	$data[$chatId]['status_url'] = $statusUrl;
@@ -158,9 +173,136 @@ function saveChatData($chatId, $message, $statusUrl) {
 	}
 
 	return [
-		'chat_id' => $chatId,
-		'title'	  => $data[$chatId]['title'],
+		'title' => $data[$chatId]['title'],
+		'title_status_url' => $titleStatusUrl,
 	];
+}
+
+
+
+/**
+ * Update chat title
+ */
+
+
+
+function updateChatTitle() {
+	$chatId = empty($_POST['chat_id'])	? null : $_POST['chat_id'];
+	$title	= empty($_POST['title'])	? null : $_POST['title'];
+	updateChatTitleResponse($chatId, $title);
+}
+
+
+
+function updateChatTitleResponse($chatId, $title) {
+	header('Content-Type: application/json');
+	echo json_encode(updateChatTitleData($chatId, $title));
+	die;
+}
+
+
+
+function updateChatTitleData($chatId, $title) {
+
+	if (empty($chatId)) {
+		return null;
+	}
+
+	$data = loadUserData();
+
+	if (!isset($data[$chatId])) {
+		return null;
+	}
+
+	if (empty($title)) {
+		$title = chatTitleFallback($data[$chatId]['prompt']);
+		if (empty($title)) {
+			return null;
+		}
+	}
+
+	$data[$chatId]['title'] = $title;
+
+	if (!saveUserData($data)) {
+		return null;
+	}
+
+	return ['title' => $title];
+}
+
+
+
+function chatTitleStatusUrl($message) {
+
+	$request = chatTitleRequest($message);
+	if (empty($request) || !is_array($request)) {
+		return null;
+	}
+
+	if (empty($request['endpoints']) ||
+		empty($request['endpoints']['status_url'])) {
+		return null;
+	}
+
+	return $request['endpoints']['status_url'];
+}
+
+
+
+function chatTitleRequest($message) {
+
+	$args = [
+		'messages'  => json_encode([
+			['role' => 'system', 'content' => 'Summarize the following user text in 3 to 5 words in the same language of the user.'],
+			['role' => 'user', 	 'content' => $message],
+		]),
+	];
+
+	return remoteRequest($args, '/async-chatgpt');
+}
+
+
+
+function chatTitleFallback($message) {
+
+	$parts = array_map('trim', explode(' ', $message));
+
+	foreach ($parts as $part) {
+		if ('' !== $part) {
+			$output[] = $part;
+			if (count($output) >= 4) {
+				break;
+			}
+		}
+	}
+
+	return implode(' ', $output);
+}
+
+
+
+/**
+ * User data functions
+ */
+
+
+
+function checkUser() {
+
+	global $userId;
+
+	if (!empty($_COOKIE['user_id'])) {
+		$userId = $_COOKIE['user_id'];
+		return;
+	}
+
+	$userId = uniqid();
+
+	setCookie(
+		'user_id',
+		$userId,
+		time() + (10 * 365 * 24 * 60 * 60)
+	);
 }
 
 
@@ -182,77 +324,6 @@ function saveUserData($data) {
 function userDataPath() {
 	global $userId;
 	return __DIR__.'/data/'.$userId.'.json';
-}
-
-
-
-function chatTitle($message) {
-	$title = chatTitleData(chatTitleRequest($message));
-	return empty($title) ? chatTitleFallback($message) : $title;
-}
-
-
-
-function chatTitleData($data) {
-
-	if (empty($data) || !is_array($data)) {
-		return null;
-	}
-
-	if (empty($data['choices'])) {
-		return null;
-	}
-
-	if (empty($data['choices'][0]['message'])) {
-		return null;
-	}
-
-	if (empty($data['choices'][0]['message']['content'])) {
-		return null;
-	}
-
-	$content = trim($data['choices'][0]['message']['content']);
-
-	$lines = array_map('trim', explode("\n", $content));
-	foreach ($lines as $line) {
-		if ('' !== $line) {
-			return $line;
-		}
-	}
-
-	return $content;
-}
-
-
-
-function chatTitleRequest($message) {
-
-	$args = [
-		'messages'  => json_encode([
-			['role' => 'system', 'content' => 'Summarize the following user text in 3 to 5 words in the same language of the user.'],
-			['role' => 'user', 	 'content' => $message],
-		]),
-	];
-
-	return remoteRequest($args, '/sync-chatgpt');
-}
-
-
-
-function chatTitleFallback($message) {
-
-	$parts = array_map('trim', explode(' ', $message));
-
-	foreach ($parts as $part) {
-		if ('' !== $part) {
-			$output[] = $part;
-			if (count($output) >= 4) {
-				break;
-			}
-		}
-	}
-
-	return implode(' ', $output);
 }
 
 
