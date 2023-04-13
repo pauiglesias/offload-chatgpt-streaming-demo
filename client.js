@@ -7,6 +7,9 @@ $(function() {
 	let lastScroll = false;
 	let lastScrollDiv = false;
 
+	let lastMessage = '';
+	let lastStatusUrl = null;
+
 
 
 	const inputHeight  = $('.chat-input-text textarea').height();
@@ -35,7 +38,7 @@ $(function() {
 
 		$(this).css('height', height + 'px');
 
-		readyInputButton($(this));
+		unreadyInputButton($(this));
 	});
 
 
@@ -60,23 +63,25 @@ $(function() {
 			return;
 		}
 
-		$input.val('');
-		$input.css('height', inputHeight + 'px');
-		readyInputButton($input);
-
 		$content = $form.closest('.chat-content');
 		regenerative($content, false);
 		setStreaming($content, true);
+
+		$input.val('');
+		$input.css('height', inputHeight + 'px');
+		unreadyInputButton($input, true);
 
 		enableInputButton($content, false);
 		const input = prepareOutput(escapeHtml(message), '');
 		const $div = addMessage($content, input, 'input');
 		$div.addClass('chat-messages-input-wait');
 
+		lastMessage = message;
+		lastStatusUrl = $content.attr('data-status-url') ? $content.attr('data-status-url') : null;
+
 		autoscroll = true;
 		scrollBottom($content);
-
-		sendMessage($content, $div, message);
+		sendMessage($content, $div, message, lastStatusUrl);
 
 /* // Debug point
 blinkEnd(addMessage($content, message, 'output')); */
@@ -87,18 +92,18 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function addMessage($content, message, type) {
 		const html = '<div class="chat-messages-item chat-messages-' + type + '"><div class="chat-messages-inner"><div class="chat-messages-icon"></div><div class="chat-messages-text">' + message + '</div></div></div>';
 		$content.find('.chat-messages').append(html);
-		return lastMessage($content);
+		return lastMessageItem($content);
 	}
 
 
 
-	function lastMessage($content) {
+	function lastMessageItem($content) {
 		return $content.find('.chat-messages .chat-messages-item').last();
 	}
 
 
 
-	function sendMessage($content, $inputDiv, message) {
+	function sendMessage($content, $inputDiv, message, statusUrl) {
 
 		const chatId = $content.attr('data-chat-id');
 
@@ -106,7 +111,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			action		: 'stream',
 			chat_id		: chatId,
 			message		: message,
-			status_url	: $content.attr('data-status-url')
+			status_url	: statusUrl
 		};
 
 		const $input = $content.find('.chat-input-text textarea');
@@ -124,14 +129,14 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			if (!e || !e.response || !e.response.status) {
 				setStreaming($content, false);
-				readyInputButton($input);
+				unreadyInputButton($input);
 				enableInputButton($content, true);
 				return;
 			}
 
 			if ('success' != e.response.status) {
 				setStreaming($content, false);
-				readyInputButton($input);
+				unreadyInputButton($input);
 				enableInputButton($content, true);
 				return;
 			}
@@ -143,13 +148,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			statusUrl = e.response.endpoints.status_url;
+			$content.attr('data-status-url', statusUrl);
+			$content.attr('data-stop-url', e.response.endpoints.stop_url ? e.response.endpoints.stop_url : '');
 
 			$inputDiv && $inputDiv.removeClass('chat-messages-input-wait');
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
-
-			$content.attr('data-status-url', statusUrl);
-			$content.attr('data-stop-url', e.response.endpoints.stop_url ? e.response.endpoints.stop_url : '');
 
 			if (chatId) {
 				$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').attr('data-status-url', statusUrl);
@@ -162,7 +166,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 		}).fail(function(e) {
 			console.log(e);
 			setStreaming($content, false);
-			readyInputButton($input);
+			unreadyInputButton($input);
 			enableInputButton($content, true);
 		});
 
@@ -231,7 +235,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 		eventSource.close();
 		$div.find('.chat-messages-text').html(prepareOutput(html, ''));
 		blinkEnd($div);
-		readyInputButton($input);
+		unreadyInputButton($input);
 		enableInputButton($content, true);
 	}
 
@@ -390,8 +394,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function readyInputButton($input) {
-		streaming || '' === $input.val().trim()
+	function unreadyInputButton($input, unready) {
+		unready || streaming || '' === $input.val().trim()
 			? $input.closest('.chat-input-text').removeClass('chat-input-ready')
 			: $input.closest('.chat-input-text').addClass('chat-input-ready');
 	}
@@ -557,7 +561,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function stopStreaming($content) {
 		setStreaming($content, false);
-		lastMessage($content).attr('data-stopped', true);
+		lastMessageItem($content).attr('data-stopped', true);
 		const stopUrl = $content.attr('data-stop-url');
 		stopUrl && $.get(stopUrl);
 	}
@@ -572,7 +576,34 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function regenerateMessage($content) {
-		const stopped = lastMessage($content).attr('data-stopped');
+
+		regenerative($content, false);
+
+		if ('' === lastMessage) {
+			return;
+		}
+
+		let $last = lastMessageItem($content);
+
+		if ($last && (
+			$last.attr('data-stopped') || $last.hasClass('chat-messages-output'))) {
+			$last.remove();
+			$last = lastMessageItem($content);
+		}
+
+		let $inputDiv = null;
+		if ($last && $last.hasClass('chat-messages-input')) {
+			$inputDiv = $last;
+			$inputDiv.addClass('chat-messages-input-wait');
+		}
+
+		setStreaming($content, true);
+		enableInputButton($content, false);
+		unreadyInputButton($content.find('.chat-input-text textarea'), true);
+
+		autoscroll = true;
+		scrollBottom($content);
+		sendMessage($content, $inputDiv, lastMessage, lastStatusUrl);
 	}
 
 
@@ -653,7 +684,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function resetChatInput($content) {
 		$input = $content.find('.chat-input textarea');
 		$input.val('').focus();
-		readyInputButton($input);
+		unreadyInputButton($input);
 	}
 
 
@@ -693,9 +724,16 @@ blinkEnd(addMessage($content, message, 'output')); */
 					continue;
 				}
 
-				const input = prepareOutput(escapeHtml(message.content), '');
+				const content = '' + message.content.trim();
+				if ('' !== content) {
 
-				addMessage($content, input, 'user' == message.role ? 'input' : 'output');
+					if ('user' == message.role) {
+						lastMessage = content;
+					}
+
+					const input = prepareOutput(escapeHtml(content), '');
+					addMessage($content, input, 'user' == message.role ? 'input' : 'output');
+				}
 			}
 
 			if (e.response &&
@@ -704,8 +742,11 @@ blinkEnd(addMessage($content, message, 'output')); */
 				e.response.body.choices[0].message &&
 				e.response.body.choices[0].message.content) {
 
-				const output = prepareOutput(escapeHtml(e.response.body.choices[0].message.content), '');
-				addMessage($content, output, 'output');
+				const content = '' + e.response.body.choices[0].message.content;
+				if ('' !== content) {
+					const output = prepareOutput(escapeHtml(content), '');
+					addMessage($content, output, 'output');
+				}
 			}
 
 			$content.removeClass('chat-content-loading');
