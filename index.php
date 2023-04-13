@@ -49,6 +49,8 @@
 
 							</div>
 
+							<p>This demo showcases the capabilities of <a href="https://rapidapi.com/microdeploy/api/offload-chatgpt" target="_blank">Offload ChatGPT API</a> by delegating ChatGPT API calls to external resources.</p>
+
 						</div>
 
 					</form>
