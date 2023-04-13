@@ -85,7 +85,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function addMessage($content, message, type) {
-		const html = '<div class="chat-messages-item chat-messages-' + type + '"><div class="chat-messages-icon"></div><div class="chat-messages-text">' + message + '</div></div>';
+		const html = '<div class="chat-messages-item chat-messages-' + type + '"><div class="chat-messages-inner"><div class="chat-messages-icon"></div><div class="chat-messages-text">' + message + '</div></div></div>';
 		$content.find('.chat-messages').append(html);
 		return lastMessage($content);
 	}
