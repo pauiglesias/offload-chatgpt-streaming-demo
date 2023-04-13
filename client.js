@@ -148,6 +148,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			scrollBottom($content);
 
 			$content.attr('data-status-url', statusUrl);
+			$content.attr('data-stop-url', e.response.endpoints.stop_url ? e.response.endpoints.stop_url : '');
 
 			if (chatId) {
 				$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').attr('data-status-url', statusUrl);
@@ -177,6 +178,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 		eventSource.onmessage = function(e) {
 
 			if (!streaming) {
+				streamMessagesEnd($content, $div, $input, eventSource, html);
 				return;
 			}
 
@@ -543,6 +545,21 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
+	function stopStreaming($content) {
+		setStreaming($content, false);
+		const stopUrl = $content.attr('data-stop-url');
+		stopUrl && $.get(stopUrl);
+	}
+
+
+
+	$('.chat-input-stop').click(function() {
+		stopStreaming($(this).closest('.chat-content'));
+		return false;
+	});
+
+
+
 	$(document).on('click', '.chat-sidebar-new', function() {
 
 		const $content = $(this).closest('.chat').find('.chat-content');
@@ -600,7 +617,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function resetChatMessages($content) {
 		$content.find('.chat-messages').html('');
-		$content.removeAttr('data-chat-id').removeAttr('data-status-url');
+		$content.removeAttr('data-chat-id').removeAttr('data-status-url').removeAttr('data-stop-url');
 		enableInputButton($content, false);
 	}
 
@@ -627,7 +644,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-			if (!e || !e.status || 'done' != e.status) {
+			if (!e || !e.status || !['done', 'stop'].includes(e.status)) {
 				$content.removeClass('chat-content-loading');
 				return;
 			}
