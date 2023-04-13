@@ -60,13 +60,12 @@ $(function() {
 			return;
 		}
 
-		streaming = true;
-
 		$input.val('');
 		$input.css('height', inputHeight + 'px');
 		readyInputButton($input);
 
 		$content = $form.closest('.chat-content');
+		setStreaming($content, true);
 
 		enableInputButton($content, false);
 		const input = prepareOutput(escapeHtml(message), '');
@@ -118,19 +117,19 @@ blinkEnd(addMessage($content, message, 'output')); */
 			}
 
 			if (chatId != $content.attr('data-chat-id')) {
-				streaming = false;
+				setStreaming($content, false);
 				return;
 			}
 
 			if (!e || !e.response || !e.response.status) {
-				streaming = false;
+				setStreaming($content, false);
 				readyInputButton($input);
 				enableInputButton($content, true);
 				return;
 			}
 
 			if ('success' != e.response.status) {
-				streaming = false;
+				setStreaming($content, false);
 				readyInputButton($input);
 				enableInputButton($content, true);
 				return;
@@ -160,7 +159,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		}).fail(function(e) {
 			console.log(e);
-			streaming = false;
+			setStreaming($content, false);
 			readyInputButton($input);
 			enableInputButton($content, true);
 		});
@@ -224,7 +223,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function streamMessagesEnd($content, $div, $input, eventSource, html) {
-		streaming = false;
+		setStreaming($content, false);
 		eventSource.close();
 		$div.find('.chat-messages-text').html(prepareOutput(html, ''));
 		blinkEnd($div);
@@ -445,6 +444,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
+	function setStreaming($content, value) {
+		streaming = value;
+		streaming ? $content.addClass('chat-streaming') : $content.removeClass('chat-streaming');
+	}
+
+
+
 	function saveChat($content, message, newChat) {
 
 		const data = {
@@ -539,9 +545,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	$(document).on('click', '.chat-sidebar-new', function() {
 
-		streaming = false;
-
 		const $content = $(this).closest('.chat').find('.chat-content');
+
+		setStreaming($content, false);
 		resetChatMessages($content);
 		resetChatInput($content);
 
@@ -554,9 +560,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	$(document).on('click', '.chat-sidebar-item', function() {
 
-		streaming = false;
-
 		const $content = $(this).closest('.chat').find('.chat-content');
+
+		setStreaming($content, false);
 		resetChatInput($content);
 
 		$(this).closest('.chat-sidebar-list').find('.chat-sidebar-item').removeClass('chat-sidebar-selected').removeClass('chat-sidebar-loading');
@@ -576,9 +582,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		e.stopPropagation();
 
-		streaming = false;
-
 		const $content = $(this).closest('.chat').find('.chat-content');
+
+		setStreaming($content, false);
 		resetChatMessages($content);
 		resetChatInput($content);
 

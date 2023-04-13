@@ -324,6 +324,9 @@ a:hover {
 							background-size: 15px 15px;
 						}
 
+						.chat-streaming button.chat-input-stop { visibility: visible; }
+						.chat-streaming button.chat-input-regenerate { display: none; }
+
 					.chat-input-inner {
 						margin: 0 auto;
 						max-width: 48rem;
