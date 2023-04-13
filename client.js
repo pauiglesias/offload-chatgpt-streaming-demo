@@ -98,7 +98,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function sendMessage($content, $old, message) {
+	function sendMessage($content, $inputDiv, message) {
 
 		const chatId = $content.attr('data-chat-id');
 
@@ -144,7 +144,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			statusUrl = e.response.endpoints.status_url;
 
-			$old.removeClass('chat-messages-input-wait');
+			$inputDiv && $inputDiv.removeClass('chat-messages-input-wait');
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
