@@ -327,6 +327,9 @@ a:hover {
 						.chat-streaming button.chat-input-stop { visibility: visible; }
 						.chat-streaming button.chat-input-regenerate { display: none; }
 
+						.chat-awaiting button.chat-input-stop { display: none; }
+						.chat-awaiting button.chat-input-regenerate { visibility: visible; }
+
 					.chat-input-inner {
 						margin: 0 auto;
 						max-width: 48rem;

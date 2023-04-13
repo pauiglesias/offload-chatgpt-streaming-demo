@@ -65,6 +65,7 @@ $(function() {
 		readyInputButton($input);
 
 		$content = $form.closest('.chat-content');
+		regenerative($content, false);
 		setStreaming($content, true);
 
 		enableInputButton($content, false);
@@ -225,6 +226,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function streamMessagesEnd($content, $div, $input, eventSource, html) {
+		regenerative($content, true);
 		setStreaming($content, false);
 		eventSource.close();
 		$div.find('.chat-messages-text').html(prepareOutput(html, ''));
@@ -382,7 +384,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function enableInputButton($content, enable) {
-		const $button = $content.find('.chat-input button[type="submit"]');
+		const $button = $content.find('.chat-input-text button[type="submit"]');
 		enable ? $button.removeAttr('disabled') : $button.attr('disabled', 'disabled');
 	}
 
@@ -437,11 +439,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	$(window).resize(function() {
+
 		$('.chat').each(function() {
 			const height = $(this).find('.chat-content').outerHeight() - $(this).find('.chat-input').height();
 			$(this).find('.chat-loading').height(height > 0 ? height : 0);
 			$(this).find('.chat-messages').height(height > 0 ? height : 0);
 		});
+
 	}).resize();
 
 
@@ -449,6 +453,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function setStreaming($content, value) {
 		streaming = value;
 		streaming ? $content.addClass('chat-streaming') : $content.removeClass('chat-streaming');
+	}
+
+
+
+	function regenerative($content, value) {
+		value && $content.find('.chat-messages').children().length ? $content.addClass('chat-awaiting') : $content.removeClass('chat-awaiting');
 	}
 
 
@@ -564,6 +574,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		const $content = $(this).closest('.chat').find('.chat-content');
 
+		regenerative($content, false);
 		setStreaming($content, false);
 		resetChatMessages($content);
 		resetChatInput($content);
@@ -579,6 +590,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		const $content = $(this).closest('.chat').find('.chat-content');
 
+		regenerative($content, false);
 		setStreaming($content, false);
 		resetChatInput($content);
 
@@ -611,6 +623,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 		removeChat(chatId);
 
 		return false;
+
 	});
 
 
@@ -683,6 +696,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			$content.removeClass('chat-content-loading');
 			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
+
+			regenerative($content, true);
 
 		});
 	}
