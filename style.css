@@ -289,10 +289,45 @@ a:hover {
 					height: auto;
 				}
 
-					.chat-input-inner {
-						padding: 25px 0 15px;
+					.chat-input-actions {
+						margin: 15px auto 10px;
 						max-width: 48rem;
+						text-align: center;
+						visibility: hidden;
+					}
+
+						.chat-input-actions button {
+							visibility: hidden;
+							display: inline-block;
+							border: 1px solid #565868;
+							border-radius: 5px;
+							color: #d9d9e3;
+							font-size: 14px;
+							padding: 10px 15px 10px 33px;
+							overflow: hidden;
+							outline: none;
+							cursor: pointer;
+							background-color: transparent;
+							background-position: 10px 11px;
+							background-repeat: no-repeat;
+						}
+
+						.chat-input-actions button:hover { background-color: #40414f; }
+
+						button.chat-input-regenerate {
+							background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg' fill='%23000000'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath fill='%23d9d9e3' d='M771.776 794.88A384 384 0 0 1 128 512h64a320 320 0 0 0 555.712 216.448H654.72a32 32 0 1 1 0-64h149.056a32 32 0 0 1 32 32v148.928a32 32 0 1 1-64 0v-50.56zM276.288 295.616h92.992a32 32 0 0 1 0 64H220.16a32 32 0 0 1-32-32V178.56a32 32 0 0 1 64 0v50.56A384 384 0 0 1 896.128 512h-64a320 320 0 0 0-555.776-216.384z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+							background-size: 15px 15px;
+						}
+
+						button.chat-input-stop {
+							background-image: url("data:image/svg+xml,%3Csvg fill='%23d9d9e3' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath d='M48.227 65.473c0-9.183 7.096-16.997 16.762-17.51 9.666-.513 116.887-.487 125.094-.487 8.207 0 17.917 9.212 17.917 17.71 0 8.499.98 117.936.49 126.609-.49 8.673-9.635 15.995-17.011 15.995-7.377 0-117.127-.327-126.341-.327-9.214 0-17.472-7.793-17.192-16.1.28-8.306.28-116.708.28-125.89zm15.951 4.684c-.153 3.953 0 112.665 0 116.19 0 3.524 3.115 5.959 7.236 6.156 4.12.198 112.165.288 114.852 0 2.686-.287 5.811-2.073 5.932-5.456.12-3.383-.609-113.865-.609-116.89 0-3.025-3.358-5.84-6.02-5.924-2.662-.085-110.503 0-114.155 0-3.652 0-7.083 1.972-7.236 5.924z' fill-rule='evenodd'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+							background-size: 15px 15px;
+						}
+
+					.chat-input-inner {
 						margin: 0 auto;
+						max-width: 48rem;
+						padding: 5px 0 15px;
 					}
 
 						.chat-input-text {

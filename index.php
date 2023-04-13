@@ -40,6 +40,14 @@
 
 					<form class="chat-input">
 
+						<div class="chat-input-actions">
+
+							<button class="chat-input-stop">Stop generating</button>
+
+							<button class="chat-input-regenerate">Regenerate response</button>
+
+						</div>
+
 						<div class="chat-input-inner">
 
 							<div class="chat-input-text">
