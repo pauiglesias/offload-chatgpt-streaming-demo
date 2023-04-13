@@ -11,7 +11,7 @@
 	--text-output-bg: #444653;
 	--text-output-bg-blink: #B0ACAE;
 
-	--sidebar-bg: #000000;
+	--sidebar-bg: #202123;
 	--content-bg: #343540;
 }
 
@@ -53,8 +53,8 @@ a:hover {
 
 			.chat-sidebar {
 				width: 25%;
-				min-width: 250px;
-				max-width: 350px;
+				min-width: 200px;
+				max-width: 300px;
 				background: var(--sidebar-bg);
 				padding: 5px;
 				border-top-left-radius: 5px;
@@ -91,8 +91,8 @@ a:hover {
 					.chat-sidebar-item {
 						position: relative;
 						font-size: 15px;
-						padding: 10px 5px 10px 27px;
-						margin: 0 7px 0;
+						padding: 10px 32px 10px 27px;
+						margin: 0 7px 0 0;
 						color: #fff;
 						text-align: left;
 						cursor: pointer;
