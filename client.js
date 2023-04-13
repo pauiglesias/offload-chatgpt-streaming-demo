@@ -557,6 +557,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function stopStreaming($content) {
 		setStreaming($content, false);
+		lastMessage($content).attr('data-stopped', true);
 		const stopUrl = $content.attr('data-stop-url');
 		stopUrl && $.get(stopUrl);
 	}
@@ -565,6 +566,19 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	$('.chat-input-stop').click(function() {
 		stopStreaming($(this).closest('.chat-content'));
+		return false;
+	});
+
+
+
+	function regenerateMessage($content) {
+		const stopped = lastMessage($content).attr('data-stopped');
+	}
+
+
+
+	$('.chat-input-regenerate').click(function() {
+		regenerateMessage($(this).closest('.chat-content'));
 		return false;
 	});
 
