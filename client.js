@@ -525,14 +525,22 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl) {
-		setTimeout(fetchTitleUrl, 1000, $content, chatId, statusUrl, titleStatusUrl);
+		setTimeout(fetchTitleUrl, 500, $content, chatId, statusUrl, titleStatusUrl);
 	}
 
 
 
 	function fetchTitleUrl($content, chatId, statusUrl, titleStatusUrl) {
 
+		if (statusUrl != $content.attr('data-status-url')) {
+			return;
+		}
+
 		$.get(titleStatusUrl, function(e) {
+
+			if (statusUrl != $content.attr('data-status-url')) {
+				return;
+			}
 
 			if (!e || !e.status || 'error' == e.status) {
 				updateChatTitle($content, chatId, statusUrl, null);
@@ -564,6 +572,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 		lastMessageItem($content).attr('data-stopped', true);
 		const stopUrl = $content.attr('data-stop-url');
 		stopUrl && $.get(stopUrl);
+		lastStatusUrl ? $content.attr('data-status-url', lastStatusUrl) : $content.removeAttr('data-status-url');
+		$content.attr('data-chat-id') && saveChat($content, null, false);
 	}
 
 
@@ -691,9 +701,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function loadChat($content, chatId, statusUrl) {
 
+		lastStatusUrl = null;
 		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
-		lastStatusUrl = statusUrl;
 
 		$.get(statusUrl, function(e) {
 
@@ -713,6 +723,11 @@ blinkEnd(addMessage($content, message, 'output')); */
 				!e.parameters.messages.length) {
 				$content.removeClass('chat-content-loading');
 				return;
+			}
+
+			if (e.endpoints &&
+				e.endpoints.from_status_url) {
+				lastStatusUrl = e.endpoints.from_status_url;
 			}
 
 			$content.find('.chat-messages').html('');
