@@ -719,13 +719,10 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function removeChat(chatId) {
-
-		const data = {
+		$.post('/server.php', {
 			action	: 'remove',
 			chat_id	: chatId
-		};
-
-		$.post('/server.php', data);
+		});
 	}
 
 
