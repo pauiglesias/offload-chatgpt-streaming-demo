@@ -693,6 +693,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
+		lastStatusUrl = statusUrl;
 
 		$.get(statusUrl, function(e) {
 
