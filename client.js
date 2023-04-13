@@ -3,9 +3,9 @@ $(function() {
 
 
 	let streaming = false;
+
 	let autoscroll = false;
-	let lastScroll = false;
-	let lastScrollDiv = false;
+	let autoscrollDiv = null;
 
 	let lastMessage = '';
 	let lastStatusUrl = null;
@@ -228,11 +228,18 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function streamMessagesEnd($content, $div, $input, eventSource, html) {
+
 		regenerative($content, true);
 		setStreaming($content, false);
+
 		eventSource.close();
+
 		$div.find('.chat-messages-text').html(prepareOutput(html, ''));
 		blinkEnd($div);
+
+		autoscroll = false;
+		autoscrollDiv = null;
+
 		unreadyInputButton($input);
 		enableInputButton($content, true);
 	}
@@ -416,26 +423,17 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function scrollBottom($content) {
 		if (autoscroll) {
-			const div = $content.find('.chat-messages')[0];
-			div.scrollTop = div.scrollHeight;
-			lastScroll = div.scrollTop;
-			lastScrollDiv = div;
+			autoscrollDiv = $content.find('.chat-messages')[0];
+			autoscrollDiv.scrollTop = autoscrollDiv.scrollHeight;
 		}
 	}
 
 
 
 	$('.chat-messages').scroll(function() {
-
-		if (false === lastScroll ||
-			false == lastScrollDiv) {
-			return;
+		if (null !== autoscrollDiv) {
+			autoscroll = Math.abs(autoscrollDiv.scrollHeight - autoscrollDiv.scrollTop - autoscrollDiv.clientHeight) < 1;
 		}
-
-		autoscroll = autoscroll
-			? (lastScrollDiv.scrollTop === lastScroll)
-			: streaming && (lastScrollDiv.scrollTop === lastScrollDiv.scrollHeight)
-
 	});
 
 
