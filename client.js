@@ -155,9 +155,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			if (chatId) {
-				$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').attr('data-status-url', statusUrl);
-			}
+			chatId && chatListStatusUrl($content, chatId, statusUrl);
 
 			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
@@ -524,6 +522,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
+	function chatListStatusUrl($content, chatId, statusUrl) {
+		$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').attr('data-status-url', statusUrl);
+	}
+
+
+
 	function waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl) {
 		setTimeout(fetchTitleUrl, 500, $content, chatId, statusUrl, titleStatusUrl);
 	}
@@ -568,12 +572,20 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function stopStreaming($content) {
+
 		setStreaming($content, false);
 		lastMessageItem($content).attr('data-stopped', true);
+
 		const stopUrl = $content.attr('data-stop-url');
 		stopUrl && $.get(stopUrl);
+
 		lastStatusUrl ? $content.attr('data-status-url', lastStatusUrl) : $content.removeAttr('data-status-url');
-		$content.attr('data-chat-id') && saveChat($content, null, false);
+
+		const chatId = $content.attr('data-chat-id');
+		if (chatId) {
+			saveChat($content, null, false);
+			chatListStatusUrl($content, chatId, lastStatusUrl);
+		}
 	}
 
 
