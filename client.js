@@ -195,9 +195,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-			const obj = JSON.parse(e.data);
-			const choice = 	obj.choices[0];
+			const obj = streamMessagesItem(e.data);
+			if (!obj) {
+				return;
+			}
 
+			const choice = 	obj.choices[0];
 			let txt = choice.delta.content;
 
 			if (null === txt ||
@@ -212,9 +215,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 				scrollBottom($content);
 			}
 
-			if (choice.finish_reason &&
-				'length' == choice.finish_reason) {
+			if (choice.finish_reason) {
 				streamMessagesEnd($content, $div, $input, eventSource, html);
+				return;
 			}
 		}
 
@@ -222,7 +225,26 @@ blinkEnd(addMessage($content, message, 'output')); */
 			console.log(e);
 			streamMessagesEnd($content, $div, $input, eventSource, html);
 		}
+	}
 
+
+
+	function streamMessagesItem(data) {
+
+		let obj = null;
+
+		try {
+
+			obj = JSON.parse(data);
+			if (!obj || !obj.choices) {
+				return false;
+			}
+
+		} catch(e) {
+			return false;
+		}
+
+		return obj;
 	}
 
 
