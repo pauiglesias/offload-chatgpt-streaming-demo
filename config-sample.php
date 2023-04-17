@@ -24,4 +24,4 @@ define('OFFLOAD_CHATGPT_API_KEY', '[YOUR_API_KEY]');
  * Your PantryID for JSON storage
  * https://getpantry.cloud/
  */
-define('PantryID', '[YOUR_PANTRY_ID]');
+define('PANTRY_ID', '[YOUR_PANTRY_ID]');
