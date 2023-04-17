@@ -12,59 +12,51 @@
 </head>
 <body>
 
-<?php if (!defined('OPENAI_API_KEY') || !defined('OFFLOAD_CHATGPT_API_KEY')) : ?>
+<div class="chat-wrapper">
 
-	<p style="background-color: red; color: white">Please provide your API Keys from the config.php file.</p>
+	<div class="chat">
 
-<?php else : ?>
+		<div class="chat-inner">
 
-	<div class="chat-wrapper">
+			<div class="chat-sidebar">
 
-		<div class="chat">
+				<div class="chat-sidebar-new">New Chat</div>
 
-			<div class="chat-inner">
+				<div class="chat-sidebar-list"></div>
 
-				<div class="chat-sidebar">
+			</div>
 
-					<div class="chat-sidebar-new">New Chat</div>
+			<div class="chat-content">
 
-					<div class="chat-sidebar-list"></div>
+				<div class="chat-messages"></div>
 
-				</div>
+				<div class="chat-loading"><span></span></div>
 
-				<div class="chat-content">
+				<form class="chat-input">
 
-					<div class="chat-messages"></div>
+					<div class="chat-input-actions">
 
-					<div class="chat-loading"><span></span></div>
+						<button class="chat-input-stop">Stop generating</button>
 
-					<form class="chat-input">
+						<button class="chat-input-regenerate">Regenerate response</button>
 
-						<div class="chat-input-actions">
+					</div>
 
-							<button class="chat-input-stop">Stop generating</button>
+					<div class="chat-input-inner">
 
-							<button class="chat-input-regenerate">Regenerate response</button>
+						<div class="chat-input-text">
 
-						</div>
+							<textarea rows="1" data-rows-max="15" autofocus require placeholder="Enter your message..."></textarea>
 
-						<div class="chat-input-inner">
-
-							<div class="chat-input-text">
-
-								<textarea rows="1" data-rows-max="15" autofocus require placeholder="Enter your message..."></textarea>
-
-								<button type="submit"><svg width="24" height="24" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.8160000000000001"></g><g id="SVGRepo_iconCarrier"> <path d="M20 4L3 11L10 14M20 4L13 21L10 14M20 4L10 14" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
-
-							</div>
-
-							<p>This demo showcases the capabilities of <a href="https://rapidapi.com/microdeploy/api/offload-chatgpt" target="_blank">Offload ChatGPT API</a> by delegating ChatGPT API calls to external resources.</p>
+							<button type="submit"><svg width="24" height="24" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.8160000000000001"></g><g id="SVGRepo_iconCarrier"> <path d="M20 4L3 11L10 14M20 4L13 21L10 14M20 4L10 14" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
 
 						</div>
 
-					</form>
+						<p>This demo showcases the capabilities of <a href="https://rapidapi.com/microdeploy/api/offload-chatgpt" target="_blank">Offload ChatGPT API</a> by delegating ChatGPT API calls to external resources.</p>
 
-				</div>
+					</div>
+
+				</form>
 
 			</div>
 
@@ -72,10 +64,10 @@
 
 	</div>
 
-	<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
-	<script src="./client.js"></script>
+</div>
 
-<?php endif; ?>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+<script src="./client.js"></script>
 
 </body>
 </html>
