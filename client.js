@@ -156,7 +156,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
-			saveChat($content, message, chat.new);
+			saveChat($content, chat.id, statusUrl, message, chat.new);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -482,14 +482,14 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function saveChat($content, message, newChat) {
+	function saveChat($content, chatId, statusUrl, message, newChat) {
 
 		const data = {
 			action		: 'save',
 			user_id		: userId,
+			chat_id		: chatId,
 			message		: message,
-			chat_id		: $content.attr('data-chat-id'),
-			status_url	: $content.attr('data-status-url')
+			status_url	: statusUrl,
 		};
 
 		$.post('/server.php', data, function(e) {
@@ -601,10 +601,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 		lastStatusUrl ? $content.attr('data-status-url', lastStatusUrl) : $content.removeAttr('data-status-url');
 
 		const chatId = $content.attr('data-chat-id');
-		if (chatId) {
-			saveChat($content, null, false);
-			chatListStatusUrl($content, chatId, lastStatusUrl);
+		if (!chatId) {
+			return;
 		}
+
+		saveChat($content, chatId, lastStatusUrl, null, false);
+		chatListStatusUrl($content, chatId, lastStatusUrl);
 	}
 
 
