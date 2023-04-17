@@ -186,7 +186,7 @@ function saveChatData($userId, $chatId, $message, $statusUrl) {
 	$data[$chatId]['updated'] = time();
 	$data[$chatId]['status_url'] = $statusUrl;
 
-	if (!saveUserData($userId, [$chatId => $data[$chatId]])) {
+	if (!saveUserData($userId, $data)) {
 		return null;
 	}
 
@@ -232,19 +232,20 @@ function updateChatTitleData($userId, $chatId, $title) {
 	}
 
 	$data = loadUserData($userId);
-
 	if (!isset($data[$chatId])) {
 		return null;
 	}
 
 	$titleNew = prepareChatTitle($title);
-
-	if (!empty($titleNew) &&
-		!saveUserData($userId, [$chatId => ['title' => $titleNew]])) {
-		return $data[$chatId]['title'];
+	if (!empty($titleNew) && !saveUserData($userId, $data)) {
+		return null;
 	}
 
-	return ['title' => empty($titleNew)? $data[$chatId]['title'] : $titleNew];
+	return [
+		'user_id'	=> $userId,
+		'chat_id'	=> $chatId,
+		'title'		=> empty($titleNew)? $data[$chatId]['title'] : $titleNew
+	];
 }
 
 
@@ -325,16 +326,21 @@ function removeChatData($userId, $chatId) {
 		return null;
 	}
 
+	$removed = true;
+
 	$data = loadUserData($userId);
-	if (!isset($data[$chatId])) {
-		return null;
+	if (isset($data[$chatId])) {
+		unset($data[$chatId]);
+		if (!saveUserData($userId, $data)) {
+			$removed = false;
+		}
 	}
 
-	if (!saveUserData($userId, [$chatId => null])) {
-		return 0;
-	}
-
-	return 1;
+	return [
+		'user_id'	=> $userId,
+		'chat_id'	=> $chatId,
+		'removed'	=> $removed,
+	];
 }
 
 
@@ -348,13 +354,18 @@ function removeChatData($userId, $chatId) {
 function chats() {
 	$userId = empty($_POST['user_id']) ? null : $_POST['user_id'];
 	header('Content-Type: application/json');
-	echo json_encode(chatsData($userId));
+	echo json_encode(chatsReponse($userId));
 	die;
 }
 
 
 
 function chatsReponse($userId) {
+
+	if (empty($userId)) {
+		return null;
+	}
+
 	return chatsData($userId);
 }
 
