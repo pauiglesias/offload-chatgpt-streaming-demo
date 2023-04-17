@@ -434,7 +434,7 @@ function prepareChatTitle($title) {
 
 
 function loadUserData($userId) {
-	$response = pantryRequest($userId, 'GET');
+	$response = pantryRequest($userId);
 	return empty($response) || !is_array($response) ? [] : $response;
 }
 
@@ -447,16 +447,19 @@ function saveUserData($userId, $data) {
 
 
 
-/* Pantry functions */
+/**
+ * Pantry functions
+ */
 
 
-function pantryRequest($basketName, $method, $data = null) {
+
+function pantryRequest($basketName, $method = 'GET', $data = null) {
 
 	set_time_limit(60);
 
 	try {
 		$curl = curl_init();
-		curl_setopt_array($curl, remoteRequestOptions($basketName, $data));
+		curl_setopt_array($curl, pantryRequestOptions($basketName, $method, $data));
 		$response = curl_exec($curl);
 		curl_close($curl);
 		return json_decode($response, true);
@@ -470,7 +473,7 @@ function pantryRequest($basketName, $method, $data = null) {
 
 
 
-function pantryRequestOptions($basketName, $method, $data = null) {
+function pantryRequestOptions($basketName, $method, $data) {
 
 	$options = [
 		CURLOPT_URL => 'https://getpantry.cloud/apiv1/pantry/'.PANTRY_ID.'/basket/'.$basketName,
