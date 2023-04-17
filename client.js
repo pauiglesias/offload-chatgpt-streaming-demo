@@ -2,6 +2,8 @@ $(function() {
 
 
 
+	let userId;
+
 	let streaming = false;
 
 	let autoscroll = false;
@@ -105,11 +107,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function sendMessage($content, $inputDiv, message, statusUrl) {
 
-		const chatId = $content.attr('data-chat-id');
+		const chat = getChat($content);
 
 		const data = {
 			action		: 'stream',
-			chat_id		: chatId,
+			user_id		: userId,
+			chat_id		: chat.id,
 			message		: message,
 			status_url	: statusUrl
 		};
@@ -122,7 +125,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-			if (chatId != $content.attr('data-chat-id')) {
+			if (chat.id != $content.attr('data-chat-id')) {
 				setStreaming($content, false);
 				return;
 			}
@@ -141,12 +144,6 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-			let newChat = false;
-			if (!chatId) {
-				newChat = true;
-				$content.attr('data-chat-id', e.chat_id);
-			}
-
 			statusUrl = e.response.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
 			$content.attr('data-stop-url', e.response.endpoints.stop_url ? e.response.endpoints.stop_url : '');
@@ -155,11 +152,11 @@ blinkEnd(addMessage($content, message, 'output')); */
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			chatId && chatListStatusUrl($content, chatId, statusUrl);
+			!chat.new && chatListStatusUrl($content, chatId, statusUrl);
 
 			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
-			saveChat($content, message, newChat);
+			saveChat($content, message, chat.new);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -489,6 +486,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		const data = {
 			action		: 'save',
+			user_id		: userId,
 			message		: message,
 			chat_id		: $content.attr('data-chat-id'),
 			status_url	: $content.attr('data-status-url')
@@ -518,6 +516,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		const data = {
 			action		: 'title',
+			user_id		: userId,
 			chat_id		: chatId,
 			title		: title
 		};
@@ -810,6 +809,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 	function removeChat(chatId) {
 		$.post('/server.php', {
 			action	: 'remove',
+			user_id	: userId,
 			chat_id	: chatId
 		});
 	}
@@ -841,9 +841,76 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	}
 
-
-
 	chats();
+
+
+
+	function getChat($content) {
+
+		const chat = {
+			id  : $content.attr('data-chat-id'),
+			new : false
+		};
+
+		if (chat.id) {
+			return chat;
+		}
+
+		const chatId = uniqueId();
+		$content.attr('data-chat-id', chatId);
+
+		return {
+			id  : chatId,
+			new : true
+		};
+	}
+
+
+
+	function getUserId() {
+		const userId = getCookie('user_id');
+		return userId ? userId : setUserId();
+	}
+
+
+
+	function setUserId() {
+		const userId = uniqueId();
+		setCookie('user_id', userId);
+		return userId;
+	}
+
+
+
+	function uniqueId() {
+		return stringId() + stringId();
+	}
+
+
+
+	function stringId() {
+		const uint32 = window.crypto.getRandomValues(new Uint32Array(1))[0];
+		return uint32.toString(16);
+	}
+
+
+
+	function getCookie(name) {
+		const value = `; ${document.cookie}`;
+		const parts = value.split(`; ${name}=`);
+		if (parts.length === 2) return parts.pop().split(';').shift();
+	}
+
+
+
+	function setCookie(name, value) {
+		const d = new Date(d.getTime() + (10 * 86400));
+		document.cookie = variable + '=' + value + '; expires=' + d.toGMTString() + ';';
+	}
+
+
+
+	userId = getUserId();
 
 
 

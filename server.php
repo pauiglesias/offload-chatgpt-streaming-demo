@@ -46,23 +46,24 @@ function postRequest() {
 
 
 function streamRequest() {
+	$userId		= trim($_POST['user_id']);
+	$chatId 	= trim($_POST['chat_id']);
 	$message 	= trim($_POST['message']);
-	$chatId 	= empty($_POST['chat_id']) ? uniqid() : $_POST['chat_id'];
 	$statusUrl 	= empty($_POST['status_url']) ? null  : $_POST['status_url'];
-	streamRequestOutput($chatId, $message, $statusUrl);
+	streamRequestOutput($userId, $chatId, $message, $statusUrl);
 }
 
 
 
-function streamRequestOutput($chatId, $message, $statusUrl) {
+function streamRequestOutput($userId, $chatId, $message, $statusUrl) {
 	header('Content-Type: application/json');
-	echo json_encode(streamRequestData($chatId, $message, $statusUrl));
+	echo json_encode(streamRequestData($userId, $chatId, $message, $statusUrl));
 	die;
 }
 
 
 
-function streamRequestData($chatId, $message, $statusUrl) {
+function streamRequestData($userId, $chatId, $message, $statusUrl) {
 
 	$args = [
 		'messages'  => json_encode([
@@ -75,8 +76,10 @@ function streamRequestData($chatId, $message, $statusUrl) {
 	}
 
 	return [
-		'chat_id'  => $chatId,
-		'response' => remoteRequest($args, '/stream-chatgpt'),
+		'user_id'		=> $userId,
+		'chat_id'		=> $chatId,
+		'status_url'	=> $statusUrl,
+		'response'		=> remoteRequest($args, '/stream-chatgpt'),
 	];
 }
 
@@ -105,6 +108,7 @@ function remoteRequest($args, $endpoint) {
 
 	return false;
 }
+
 
 
 function remoteRequestOptions($args, $endpoint) {
@@ -137,57 +141,60 @@ function remoteRequestOptionsArgs($args = []) {
 
 
 function saveChat() {
+	$userId 	= empty($_POST['user_id'])		? null : $_POST['user_id'];
 	$chatId 	= empty($_POST['chat_id'])		? null : $_POST['chat_id'];
 	$message	= empty($_POST['message'])		? null : $_POST['message'];
 	$statusUrl 	= empty($_POST['status_url'])	? null : $_POST['status_url'];
-	saveChatResponse($chatId, $message, $statusUrl);
+	saveChatResponse($userId, $chatId, $message, $statusUrl);
 }
 
 
 
-function saveChatResponse($chatId, $message, $statusUrl) {
+function saveChatResponse($userId, $chatId, $message, $statusUrl) {
 	header('Content-Type: application/json');
-	echo json_encode(saveChatData($chatId, $message, $statusUrl));
+	echo json_encode(saveChatData($userId, $chatId, $message, $statusUrl));
 	die;
 }
 
 
 
-function saveChatData($chatId, $message, $statusUrl) {
+function saveChatData($userId, $chatId, $message, $statusUrl) {
 
-	if (empty($chatId) || empty($statusUrl) || empty($message)) {
+	if (empty($userId) ||
+		empty($chatId) ||
+		empty($statusUrl) ||
+		empty($message)) {
 		return null;
 	}
 
-	$data = loadUserData();
+	$data = loadUserData($userId);
 
 	$titleStatusUrl = null;
 
 	if (!isset($data[$chatId])) {
 
 		$data[$chatId] = [
-			'title'		=> null,
 			'created'	=> time(),
 			'updated'	=> time(),
+			'title'		=> chatTitleFallback($message),
 			'prompt'	=> $message,
 		];
 
 		$titleStatusUrl = chatTitleStatusUrl($message);
-		if (empty($titleStatusUrl)) {
-			$data[$chatId]['title'] = chatTitleFallback($message);
-		}
 	}
 
 	$data[$chatId]['updated'] = time();
 	$data[$chatId]['status_url'] = $statusUrl;
 
-	if (!saveUserData($data)) {
+	if (!saveUserData($userId, $data)) {
 		return null;
 	}
 
 	return [
-		'title' => $data[$chatId]['title'],
-		'title_status_url' => $titleStatusUrl,
+		'user_id'			=> $userId,
+		'chat_id'			=> $chatId,
+		'title'				=> $data[$chatId]['title'],
+		'title_status_url'	=> $titleStatusUrl,
 	];
 }
 
@@ -200,49 +207,46 @@ function saveChatData($chatId, $message, $statusUrl) {
 
 
 function updateChatTitle() {
+	$userId = empty($_POST['user_id'])	? null : $_POST['user_id'];
 	$chatId = empty($_POST['chat_id'])	? null : $_POST['chat_id'];
 	$title	= empty($_POST['title'])	? null : $_POST['title'];
-	updateChatTitleResponse($chatId, $title);
+	updateChatTitleResponse($userId, $chatId, $title);
 }
 
 
 
-function updateChatTitleResponse($chatId, $title) {
+function updateChatTitleResponse($userId, $chatId, $title) {
 	header('Content-Type: application/json');
-	echo json_encode(updateChatTitleData($chatId, $title));
+	echo json_encode(updateChatTitleData($userId, $chatId, $title));
 	die;
 }
 
 
 
-function updateChatTitleData($chatId, $title) {
+function updateChatTitleData($userId, $chatId, $title) {
 
-	if (empty($chatId)) {
+	if (empty($userId) ||
+		empty($chatId) ||
+		empty($title)) {
 		return null;
 	}
 
-	$data = loadUserData();
+	$data = loadUserData($userId);
 
 	if (!isset($data[$chatId])) {
 		return null;
 	}
 
-	$title = prepareChatTitle($title);
+	$titleNew = prepareChatTitle($title);
 
-	if (empty($title)) {
-		$title = chatTitleFallback($data[$chatId]['prompt']);
-		if (empty($title)) {
+	if (!empty($titleNew)) {
+		$data[$chatId]['title'] = $titleNew;
+		if (!saveUserData($userId, $data)) {
 			return null;
 		}
 	}
 
-	$data[$chatId]['title'] = $title;
-
-	if (!saveUserData($data)) {
-		return null;
-	}
-
-	return ['title' => $title];
+	return ['title' => empty($titleNew)? $data[$chatId]['title'] : $titleNew];
 }
 
 
@@ -302,33 +306,34 @@ function chatTitleFallback($message) {
 
 
 function removeChat() {
+	$userId = empty($_POST['user_id'])	? null : $_POST['user_id'];
 	$chatId = empty($_POST['chat_id'])	? null : $_POST['chat_id'];
-	removeChatResponse($chatId);
+	removeChatResponse($userId, $chatId);
 }
 
 
 
-function removeChatResponse($chatId) {
+function removeChatResponse($userId, $chatId) {
 	header('Content-Type: application/json');
-	echo json_encode(removeChatData($chatId));
+	echo json_encode(removeChatData($userId, $chatId));
 	die;
 }
 
 
 
-function removeChatData($chatId) {
+function removeChatData($userId, $chatId) {
 
 	if (empty($chatId)) {
 		return null;
 	}
 
-	$data = loadUserData();
+	$data = loadUserData($userId);
 	if (!isset($data[$chatId])) {
 		return 0;
 	}
 
 	unset($data[$chatId]);
-	if (!saveUserData($data)) {
+	if (!saveUserData($userId, $data)) {
 		return null;
 	}
 
@@ -344,16 +349,23 @@ function removeChatData($chatId) {
 
 
 function chats() {
+	$userId = empty($_POST['user_id']) ? null : $_POST['user_id'];
 	header('Content-Type: application/json');
-	echo json_encode(chatsData());
+	echo json_encode(chatsData($userId));
 	die;
 }
 
 
 
-function chatsData() {
-	$data = loadUserData();
-	return empty($data) ? null : ['chats' => chatsDataItems($data)];
+function chatsReponse($userId) {
+	return chatsData($userId);
+}
+
+
+
+function chatsData($userId) {
+	$data = loadUserData($userId);
+	return ['chats' => chatsDataItems($data)];
 }
 
 
@@ -361,6 +373,10 @@ function chatsData() {
 function chatsDataItems($data) {
 
 	$items = [];
+
+	if (empty($data)) {
+		return $items;
+	}
 
 	foreach ($data as $chatId => $info) {
 
@@ -420,34 +436,14 @@ function prepareChatTitle($title) {
 
 
 
-function checkUser() {
-
-	global $userId;
-
-	if (!empty($_COOKIE['user_id'])) {
-		$userId = $_COOKIE['user_id'];
-		return;
-	}
-
-	$userId = uniqid();
-
-	setCookie(
-		'user_id',
-		$userId,
-		time() + (10 * 365 * 24 * 60 * 60)
-	);
-}
-
-
-
-function loadUserData() {
+function loadUserData($userId) {
 	$data = @json_decode(@file_get_contents(userDataPath()), true);
 	return empty($data) || !is_array($data) ? [] : $data;
 }
 
 
 
-function saveUserData($data) {
+function saveUserData($userId, $data) {
 	$json = @json_encode($data, JSON_UNESCAPED_SLASHES);
 	return empty($json) ? null : @file_put_contents(userDataPath(), $json);
 }
@@ -461,5 +457,4 @@ function userDataPath() {
 
 
 
-checkUser();
 postRequest();
