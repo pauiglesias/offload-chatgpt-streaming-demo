@@ -12,4 +12,4 @@ https://rapidapi.com/microdeploy/api/offload-chatgpt
 
 # Start with PHP server
 
-php -S 0.0.0.0:8010 -t .
+php -S 127.0.01:8000 -t .
