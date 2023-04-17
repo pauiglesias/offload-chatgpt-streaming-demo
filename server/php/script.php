@@ -459,7 +459,7 @@ function saveUserData($userId, $data) {
 
 
 function userDataPath($userId) {
-	return __DIR__.'/data/'.$userId.'.json';
+	return __DIR__.'../../data/'.$userId.'.json';
 }
 
 
