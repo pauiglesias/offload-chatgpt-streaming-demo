@@ -502,13 +502,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-			if (e.title) {
-				addChatList($content.closest('.chat'), data.chat_id, e.title, data.status_url, true);
+			if (e.title_status_url) {
+				waitForChatTitleUrl($content, data.chat_id, data.status_url, e.title_status_url);
 				return;
 			}
 
-			if (e.title_status_url) {
-				waitForChatTitleUrl($content, data.chat_id, data.status_url, e.title_status_url);
+			if (e.title) {
+				addChatList($content.closest('.chat'), data.chat_id, e.title, data.status_url, true);
 			}
 
 		});
