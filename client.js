@@ -125,11 +125,6 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-			if (chat.id != $content.attr('data-chat-id')) {
-				setStreaming($content, false);
-				return;
-			}
-
 			if (!e || !e.response || !e.response.status) {
 				setStreaming($content, false);
 				unreadyInputButton($input);
@@ -144,6 +139,15 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
+			if (!chat.new && chat.id != $content.attr('data-chat-id')) {
+				setStreaming($content, false);
+				return;
+			}
+
+			if (chat.new) {
+				$content.attr('data-chat-id', chat.id);
+			}
+
 			statusUrl = e.response.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
 			$content.attr('data-stop-url', e.response.endpoints.stop_url ? e.response.endpoints.stop_url : '');
@@ -152,7 +156,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			!chat.new && chatListStatusUrl($content, chatId, statusUrl);
+			!chat.new && chatListStatusUrl($content, chat.id, statusUrl);
 
 			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
@@ -825,9 +829,12 @@ blinkEnd(addMessage($content, message, 'output')); */
 			const $chat = $(this);
 			$chat.find('.chat-sidebar-list').addClass('chat-sidebar-list-loading');
 
-			$.post('/server.php', { action: 'chats' }, function(e) {
+			const data = {
+				action	: 'chats',
+				user_id	: userId
+			};
 
-				$chat.find('.chat-sidebar-list').removeClass('chat-sidebar-list-loading');
+			$.post('/server.php', data, function(e) {
 
 				if (!e || !e.chats || !e.chats.length) {
 					return;
@@ -837,13 +844,13 @@ blinkEnd(addMessage($content, message, 'output')); */
 					addChatList($chat, item.chat_id, item.title, item.status_url, false);
 				}
 
+			}).always(function() {
+				$chat.find('.chat-sidebar-list').removeClass('chat-sidebar-list-loading');
 			});
 
 		});
 
 	}
-
-	chats();
 
 
 
@@ -858,11 +865,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 			return chat;
 		}
 
-		const chatId = uniqueId();
-		$content.attr('data-chat-id', chatId);
-
 		return {
-			id  : chatId,
+			id  : uniqueId(),
 			new : true
 		};
 	}
@@ -914,6 +918,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	userId = getUserId();
+
+	chats();
 
 
 
