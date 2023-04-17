@@ -434,62 +434,21 @@ function prepareChatTitle($title) {
 
 
 function loadUserData($userId) {
-	$response = pantryRequest($userId);
-	return empty($response) || !is_array($response) ? [] : $response;
+	$data = @json_decode(@file_get_contents(userDataPath($userId)), true);
+	return empty($data) || !is_array($data) ? [] : $data;
 }
 
 
 
 function saveUserData($userId, $data) {
-	$response = pantryRequest($userId, 'POST', $data);
-	return empty($response) || !is_array($response) ? [] : $response;
+	$json = @json_encode($data, JSON_UNESCAPED_SLASHES);
+	return empty($json) ? null : @file_put_contents(userDataPath($userId), $json);
 }
 
 
 
-/**
- * Pantry functions
- */
-
-
-
-function pantryRequest($basketName, $method = 'GET', $data = null) {
-
-	set_time_limit(60);
-
-	try {
-		$curl = curl_init();
-		curl_setopt_array($curl, pantryRequestOptions($basketName, $method, $data));
-		$response = curl_exec($curl);
-		curl_close($curl);
-		return json_decode($response, true);
-
-	} catch(Exception $e) {
-		error_log($e->getMessage());
-	}
-
-	return false;
-}
-
-
-
-function pantryRequestOptions($basketName, $method, $data) {
-
-	$options = [
-		CURLOPT_URL => 'https://getpantry.cloud/apiv1/pantry/'.PANTRY_ID.'/basket/'.$basketName,
-		CURLOPT_RETURNTRANSFER	=> true,
-		CURLOPT_MAXREDIRS		=> 1,
-		CURLOPT_TIMEOUT			=> 60,
-		CURLOPT_FOLLOWLOCATION	=> true,
-		CURLOPT_HTTP_VERSION	=> CURL_HTTP_VERSION_1_1,
-		CURLOPT_CUSTOMREQUEST	=> $method,
-	];
-
-	if (!empty($data)) {
-		$options['CURLOPT_POSTFIELDS'] = http_build_query($data);
-	}
-
-	return $options;
+function userDataPath($userId) {
+	return __DIR__.'/data/'.$userId.'.json';
 }
 
 
