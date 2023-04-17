@@ -119,7 +119,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		const $input = $content.find('.chat-input-text textarea');
 
-		$.post('/server.php', data, function(e) {
+		$.post(chatConfig.serverUrl, data, function(e) {
 
 			if (!streaming) {
 				return;
@@ -496,7 +496,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			status_url	: statusUrl,
 		};
 
-		$.post('/server.php', data, function(e) {
+		$.post(chatConfig.serverUrl, data, function(e) {
 
 			if (!e || !newChat) {
 				return;
@@ -525,7 +525,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			title		: title
 		};
 
-		$.post('/server.php', data, function(e) {
+		$.post(chatConfig.serverUrl, data, function(e) {
 			if (e && e.title) {
 				addChatList($content.closest('.chat'), chatId, e.title, statusUrl, true);
 				$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
@@ -813,7 +813,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function removeChat(chatId) {
-		$.post('/server.php', {
+		$.post(chatConfig.serverUrl, {
 			action	: 'remove',
 			user_id	: userId,
 			chat_id	: chatId
@@ -834,7 +834,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 				user_id	: userId
 			};
 
-			$.post('/server.php', data, function(e) {
+			$.post(chatConfig.serverUrl, data, function(e) {
 
 				if (!e || !e.chats || !e.chats.length) {
 					return;
