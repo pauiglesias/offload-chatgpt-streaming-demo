@@ -18,10 +18,3 @@ define('OPENAI_API_KEY', '[YOUR_API_KEY]');
  * https://rapidapi.com/microdeploy/api/offload-chatgpt
  */
 define('OFFLOAD_CHATGPT_API_KEY', '[YOUR_API_KEY]');
-
-
-/**
- * Your PantryID for JSON storage
- * https://getpantry.cloud/
- */
-define('PANTRY_ID', '[YOUR_PANTRY_ID]');
