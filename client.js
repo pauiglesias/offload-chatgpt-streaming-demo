@@ -906,9 +906,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function setCookie(name, value) {
-		const d = new Date();
+		let d = new Date();
 		d = new Date(d.getTime() + (10 * 86400));
-		document.cookie = variable + '=' + value + '; expires=' + d.toGMTString() + ';';
+		document.cookie = name + '=' + value + '; expires=' + d.toGMTString() + ';';
 	}
 
 
