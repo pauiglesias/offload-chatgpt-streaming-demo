@@ -922,9 +922,15 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 	function setCookie(name, value) {
-		let d = new Date();
-		d = new Date(d.getTime() + (10 * 86400));
-		document.cookie = name + '=' + value + '; expires=' + d.toGMTString() + ';';
+		document.cookie = name + '=' + value + '; expires=' + cookieDate() + ';path=/';
+	}
+
+
+
+	function cookieDate() {
+		const d = new Date();
+		d.setFullYear(d.getFullYear() + 1);
+		return d.toGMTString();
 	}
 
 
