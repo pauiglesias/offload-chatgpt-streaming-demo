@@ -63,6 +63,15 @@ a:hover {
 				flex-direction: column;
 			}
 
+				.chat-sidebar h1 {
+					color: #adaeb1;
+					font-size: 16px;
+					padding: 0;
+					margin: 10px 0 15px;
+					text-align: center;
+					font-weight: normal;;
+				}
+
 				.chat-sidebar-new {
 					font-size: 15px;
 					padding: 7px 5px 5px 25px;
