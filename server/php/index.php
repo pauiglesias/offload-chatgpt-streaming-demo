@@ -57,7 +57,7 @@ function streamRequest() {
 
 function streamRequestOutput($userId, $chatId, $message, $statusUrl) {
 	header('Content-Type: application/json');
-	echo json_encode(streamRequestData($userId, $chatId, $message, $statusUrl));
+	echo json_encode(streamRequestData($userId, $chatId, $message, $statusUrl), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
@@ -68,7 +68,7 @@ function streamRequestData($userId, $chatId, $message, $statusUrl) {
 	$args = [
 		'messages'  => json_encode([
 			['role' => 'user', 'content' => $message],
-		]),
+		], JSON_UNESCAPED_SLASHES),
 	];
 
 	if (!empty($statusUrl)) {
@@ -152,7 +152,7 @@ function saveChat() {
 
 function saveChatResponse($userId, $chatId, $message, $statusUrl) {
 	header('Content-Type: application/json');
-	echo json_encode(saveChatData($userId, $chatId, $message, $statusUrl));
+	echo json_encode(saveChatData($userId, $chatId, $message, $statusUrl), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
@@ -217,7 +217,7 @@ function updateChatTitle() {
 
 function updateChatTitleResponse($userId, $chatId, $title) {
 	header('Content-Type: application/json');
-	echo json_encode(updateChatTitleData($userId, $chatId, $title));
+	echo json_encode(updateChatTitleData($userId, $chatId, $title), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
@@ -314,7 +314,7 @@ function removeChat() {
 
 function removeChatResponse($userId, $chatId) {
 	header('Content-Type: application/json');
-	echo json_encode(removeChatData($userId, $chatId));
+	echo json_encode(removeChatData($userId, $chatId), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
@@ -354,7 +354,7 @@ function removeChatData($userId, $chatId) {
 function chats() {
 	$userId = empty($_POST['user_id']) ? null : $_POST['user_id'];
 	header('Content-Type: application/json');
-	echo json_encode(chatsReponse($userId));
+	echo json_encode(chatsReponse($userId), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
