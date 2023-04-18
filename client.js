@@ -135,17 +135,10 @@ $(function() {
 				return;
 			}
 
-			if (!chat.new && chat.id != $content.attr('data-chat-id')) {
-				setStreaming($content, false);
-				return;
-			}
-
-			if (chat.new) {
-				$content.attr('data-chat-id', chat.id);
-			}
-
 			lastUserMessage = message;
 			prevStatusUrl = $content.attr('data-status-url') ? $content.attr('data-status-url') : '';
+
+			chat.new && $content.attr('data-chat-id', chat.id);
 
 			statusUrl = e.response.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
@@ -155,11 +148,8 @@ $(function() {
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			!chat.new && chatListStatusUrl($content, chat.id, statusUrl);
-
-			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
-
 			saveChat($content, chat.id, statusUrl, message, chat.new);
+			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -559,12 +549,6 @@ $(function() {
 		const $list = $chat.find('.chat-sidebar .chat-sidebar-list');
 		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '">' + escapeHtml(title)) + '<span></span></div>';
 		prepend ? $list.prepend(html) && $list.scrollTop(0) : $list.append(html);
-	}
-
-
-
-	function chatListStatusUrl($content, chatId, statusUrl) {
-		$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').attr('data-status-url', statusUrl);
 	}
 
 
