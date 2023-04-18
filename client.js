@@ -9,7 +9,7 @@ $(function() {
 	let autoscroll = false;
 	let autoscrollDiv = null;
 
-	let prevStatusUrl = '';
+	let fromStatusUrl = '';
 	let lastUserMessage = '';
 
 
@@ -109,7 +109,7 @@ $(function() {
 			user_id			: userId,
 			chat_id			: chat.id,
 			message			: message,
-			from_status_url	: prevStatusUrl
+			from_status_url	: $content.attr('data-status-url') || ''
 		};
 
 		const $input = $content.find('.chat-input-text textarea');
@@ -136,13 +136,14 @@ $(function() {
 			}
 
 			lastUserMessage = message;
-			prevStatusUrl = $content.attr('data-status-url') ? $content.attr('data-status-url') : '';
 
 			chat.new && $content.attr('data-chat-id', chat.id);
 
 			statusUrl = e.response.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
 			$content.attr('data-stop-url', e.response.endpoints.stop_url ? e.response.endpoints.stop_url : '');
+
+			fromStatusUrl = data.from_status_url;
 
 			$inputDiv && $inputDiv.removeClass('chat-messages-input-wait');
 			const $div = addMessage($content, squareCursor(true), 'output');
@@ -628,7 +629,8 @@ $(function() {
 
 		regenerative($content, false);
 
-		if ('' === lastUserMessage) {
+		if ('' === fromStatusUrl ||
+			'' === lastUserMessage) {
 			return;
 		}
 
@@ -646,11 +648,11 @@ $(function() {
 			$inputDiv.addClass('chat-messages-input-wait');
 		}
 
-		$content.attr('data-status-url', prevStatusUrl);
-
 		setStreaming($content, true);
 		enableInputButton($content, false);
 		unreadyInputButton($content.find('.chat-input-text textarea'), true);
+
+		$content.attr('data-status-url', fromStatusUrl);
 
 		autoscroll = true;
 		scrollBottom($content);
@@ -785,12 +787,7 @@ $(function() {
 				return;
 			}
 
-			if (chatId != $content.attr('data-chat-id') ||
-				statusUrl != $content.attr('data-status-url')) {
-				return;
-			}
-
-			if (!e || !e.status || !['done', 'stop'].includes(e.status)) {
+			if (!e || !e.status) {
 				return;
 			}
 
@@ -800,7 +797,8 @@ $(function() {
 				return;
 			}
 
-			prevStatusUrl = statusUrl;
+			fromStatusUrl = e.endpoints && e.endpoints.from_status_url ? e.endpoints.from_status_url : '';
+
 			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
 
 			$content.find('.chat-messages').html('');
@@ -825,7 +823,8 @@ $(function() {
 				}
 			}
 
-			if (e.response &&
+			if (['done', 'stop', 'stream'].includes(e.status) &&
+				e.response &&
 				e.response.body &&
 				e.response.body.choices &&
 				e.response.body.choices[0].message &&
