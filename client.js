@@ -101,7 +101,7 @@ $(function() {
 	function sendMessage($content, $inputDiv, message) {
 
 		const chat = getChat($content);
-		const timestampId = timestamp($content);
+		const watermarkId = watermark($content);
 
 		const data = {
 			action			: 'stream',
@@ -116,7 +116,7 @@ $(function() {
 		$.post(chatConfig.serverUrl, data, function(e) {
 
 			if (!streaming ||
-				!timestamp($content, timestampId)) {
+				!watermark($content, watermarkId)) {
 				return;
 			}
 
@@ -166,12 +166,12 @@ $(function() {
 	function streamMessages($content, $div, $input, url) {
 
 		let html = '';
-		const timestampId = timestamp($content);
+		const watermarkId = watermark($content);
 		const eventSource = new EventSource(url);
 
 		eventSource.onmessage = function(e) {
 
-			if (!timestamp($content, timestampId)) {
+			if (!watermark($content, watermarkId)) {
 				return;
 			}
 
@@ -221,7 +221,7 @@ $(function() {
 			console.log(e);
 
 			if (!streaming ||
-				!timestamp($content, timestampId)) {
+				!watermark($content, watermarkId)) {
 				return;
 			}
 
@@ -749,7 +749,7 @@ $(function() {
 
 	function loadChat($content, chatId) {
 
-		const timestampId = timestamp($content);
+		const watermarkId = watermark($content);
 
 		$content.addClass('chat-content-loading');
 
@@ -761,7 +761,7 @@ $(function() {
 
 		$.post(chatConfig.serverUrl, data, function(e) {
 
-			if (!timestamp($content, timestampId)) {
+			if (!watermark($content, watermarkId)) {
 				return;
 			}
 
@@ -782,7 +782,7 @@ $(function() {
 
 	function loadChatJson($content, chatId, statusUrl) {
 
-		const timestampId = timestamp($content);
+		const watermarkId = watermark($content);
 
 		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
@@ -790,7 +790,7 @@ $(function() {
 
 		$.get(statusUrl, function(e) {
 
-			if (!timestamp($content, timestampId)) {
+			if (!watermark($content, watermarkId)) {
 				return;
 			}
 
@@ -848,7 +848,7 @@ $(function() {
 
 		}).always(function() {
 
-			if (!timestamp($content, timestampId)) {
+			if (!watermark($content, watermarkId)) {
 				return;
 			}
 
@@ -920,15 +920,15 @@ $(function() {
 
 
 
-	function timestamp($content, timestampId) {
+	function watermark($content, watermarkId) {
 
-		if (timestampId) {
-			return timestampId === parseInt($content.attr('data-timestamp'), 10);
+		if (watermarkId) {
+			return watermarkId === parseInt($content.attr('data-watermark'), 10);
 		}
 
-		const timestampNow = new Date().getTime();
-		$content.attr('data-timestamp', timestampNow);
-		return timestampNow;
+		const watermarkNow = new Date().getTime();
+		$content.attr('data-watermark', watermarkNow);
+		return watermarkNow;
 	}
 
 
