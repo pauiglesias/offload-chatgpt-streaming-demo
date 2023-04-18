@@ -807,6 +807,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 			regenerative($content, true);
 
+		}).always(function() {
+			streaming || enableInputButton($content, true);
 		});
 	}
 
