@@ -507,7 +507,7 @@ $(function() {
 			}
 
 			if (e.title) {
-				addChatList($content.closest('.chat'), data.chat_id, e.title, data.status_url, true);
+				addChatList($content.closest('.chat'), data.chat_id, e.title, true);
 			}
 
 		});
@@ -530,7 +530,7 @@ $(function() {
 				return;
 			}
 
-			addChatList($content.closest('.chat'), chatId, e.title, statusUrl, true);
+			addChatList($content.closest('.chat'), chatId, e.title, true);
 			$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
 
 			if (chatId != $content.attr('data-chat-id') ||
@@ -546,9 +546,9 @@ $(function() {
 
 
 
-	function addChatList($chat, chatId, title, statusUrl, prepend) {
+	function addChatList($chat, chatId, title, prepend) {
 		const $list = $chat.find('.chat-sidebar .chat-sidebar-list');
-		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '" data-status-url="' + statusUrl + '">' + escapeHtml(title)) + '<span></span></div>';
+		const html = ('<div class="chat-sidebar-item" data-chat-id="' + chatId + '">' + escapeHtml(title)) + '<span></span></div>';
 		prepend ? $list.prepend(html) && $list.scrollTop(0) : $list.append(html);
 	}
 
@@ -872,7 +872,7 @@ $(function() {
 				}
 
 				for (item of e.chats) {
-					addChatList($chat, item.chat_id, item.title, item.status_url, false);
+					addChatList($chat, item.chat_id, item.title, false);
 				}
 
 			}).always(function() {
