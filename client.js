@@ -525,12 +525,22 @@ $(function() {
 		};
 
 		$.post(chatConfig.serverUrl, data, function(e) {
-			if (e && e.title) {
-				addChatList($content.closest('.chat'), chatId, e.title, statusUrl, true);
-				$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
-				$list.find('.chat-sidebar-item[data-chat-id="' + chatId + '"]').addClass('chat-sidebar-selected');
-				$list.scrollTop(0);
+
+			if (!e || !e.title) {
+				return;
 			}
+
+			addChatList($content.closest('.chat'), chatId, e.title, statusUrl, true);
+			$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
+
+			if (chatId != $content.attr('data-chat-id') ||
+				statusUrl != $content.attr('data-chat-id')) {
+				return;
+			}
+
+			$list.find('.chat-sidebar-item[data-chat-id="' + chatId + '"]').addClass('chat-sidebar-selected');
+			$list.scrollTop(0);
+
 		});
 	}
 
@@ -643,7 +653,7 @@ $(function() {
 			$inputDiv.addClass('chat-messages-input-wait');
 		}
 
-		$content.attr('data-status-url', prevStatusUrl ? prevStatusUrl : '');
+		$content.attr('data-status-url', prevStatusUrl);
 
 		setStreaming($content, true);
 		enableInputButton($content, false);
@@ -664,8 +674,6 @@ $(function() {
 
 
 	$(document).on('click', '.chat-sidebar-new', function() {
-
-		prevStatusUrl = null;
 
 		const $content = $(this).closest('.chat').find('.chat-content');
 
@@ -739,8 +747,6 @@ $(function() {
 
 	function loadChat($content, chatId, statusUrl) {
 
-		prevStatusUrl = statusUrl;
-
 		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
 		$content.removeAttr('data-stop-url');
@@ -763,6 +769,9 @@ $(function() {
 				!e.parameters.messages.length) {
 				return;
 			}
+
+			prevStatusUrl = statusUrl;
+			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
 
 			$content.find('.chat-messages').html('');
 			$content.find('.chat-messages').scrollTop(0);
@@ -803,7 +812,6 @@ $(function() {
 
 		}).always(function() {
 			$content.removeClass('chat-content-loading');
-			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
 			streaming || enableInputButton($content, true);
 		});
 	}
