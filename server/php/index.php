@@ -4,41 +4,6 @@
 
 
 
-function postRequest() {
-
-	if (empty($_POST['action'])) {
-		return;
-	}
-
-	if ('stream' == $_POST['action']) {
-		streamRequest();
-		return;
-	}
-
-	if ('save' == $_POST['action']) {
-		saveChat();
-		return;
-	}
-
-	if ('title' == $_POST['action']) {
-		updateChatTitle();
-		return;
-	}
-
-	if ('remove' == $_POST['action']) {
-		removeChat();
-		return;
-	}
-
-	if ('chats' == $_POST['action']) {
-		chats();
-		return;
-	}
-
-}
-
-
-
 /**
  * Streaming
  */
@@ -46,24 +11,28 @@ function postRequest() {
 
 
 function streamRequest() {
-	$userId		= trim($_POST['user_id']);
-	$chatId 	= trim($_POST['chat_id']);
-	$message 	= trim($_POST['message']);
-	$statusUrl 	= empty($_POST['status_url']) ? null  : $_POST['status_url'];
-	streamRequestOutput($userId, $chatId, $message, $statusUrl);
+	$userId 		= empty($_POST['user_id'])			? null : $_POST['user_id'];
+	$chatId 		= empty($_POST['chat_id'])			? null : $_POST['chat_id'];
+	$message		= empty($_POST['message'])			? null : $_POST['message'];
+	$fromStatusUrl 	= empty($_POST['from_status_url'])	? null  : $_POST['from_status_url'];
+	streamRequestOutput($userId, $chatId, $message, $fromStatusUrl);
 }
 
 
 
-function streamRequestOutput($userId, $chatId, $message, $statusUrl) {
+function streamRequestOutput($userId, $chatId, $message, $fromStatusUrl) {
 	header('Content-Type: application/json');
-	echo json_encode(streamRequestData($userId, $chatId, $message, $statusUrl), JSON_UNESCAPED_SLASHES);
+	echo json_encode(streamRequestData($userId, $chatId, $message, $fromStatusUrl), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
 
 
-function streamRequestData($userId, $chatId, $message, $statusUrl) {
+function streamRequestData($userId, $chatId, $message, $fromStatusUrl) {
+
+	if (empty($message)) {
+		return null;
+	}
 
 	$args = [
 		'messages'  => json_encode([
@@ -71,15 +40,15 @@ function streamRequestData($userId, $chatId, $message, $statusUrl) {
 		], JSON_UNESCAPED_SLASHES),
 	];
 
-	if (!empty($statusUrl)) {
-		$args['from_status_url'] = $statusUrl;
+	if (!empty($fromStatusUrl)) {
+		$args['from_status_url'] = $fromStatusUrl;
 	}
 
 	return [
-		'user_id'		=> $userId,
-		'chat_id'		=> $chatId,
-		'status_url'	=> $statusUrl,
-		'response'		=> remoteRequest($args, '/stream-chatgpt'),
+		'user_id'			=> $userId,
+		'chat_id'			=> $chatId,
+		'from_status_url'	=> $fromStatusUrl,
+		'response'			=> remoteRequest($args, '/stream-chatgpt'),
 	];
 }
 
@@ -463,5 +432,45 @@ function userDataPath($userId) {
 }
 
 
+
+
+/**
+ * User actions
+ */
+
+
+
+function postRequest() {
+
+	if (empty($_POST['action'])) {
+		return;
+	}
+
+	if ('stream' == $_POST['action']) {
+		streamRequest();
+		return;
+	}
+
+	if ('save' == $_POST['action']) {
+		saveChat();
+		return;
+	}
+
+	if ('title' == $_POST['action']) {
+		updateChatTitle();
+		return;
+	}
+
+	if ('remove' == $_POST['action']) {
+		removeChat();
+		return;
+	}
+
+	if ('chats' == $_POST['action']) {
+		chats();
+		return;
+	}
+
+}
 
 postRequest();
