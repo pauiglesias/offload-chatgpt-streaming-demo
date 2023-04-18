@@ -145,8 +145,7 @@ function saveChatData($userId, $chatId, $message, $statusUrl) {
 		$data[$chatId] = [
 			'created'	=> time(),
 			'updated'	=> time(),
-			'title'		=> chatTitleFallback($message),
-			'prompt'	=> $message,
+			'title'		=> prepareChatTitle(chatTitleFallback($message)),
 		];
 
 		$titleStatusUrl = chatTitleStatusUrl($message);
@@ -206,14 +205,18 @@ function updateChatTitleData($userId, $chatId, $title) {
 	}
 
 	$titleNew = prepareChatTitle($title);
-	if (!empty($titleNew) && !saveUserData($userId, $data)) {
-		return null;
+	if (!empty($titleNew)) {
+		$previousTitle = $data[$chatId]['title'];
+		$data[$chatId]['title'] = $titleNew;
+		if (!saveUserData($userId, $data)) {
+			$data[$chatId]['title'] = $previousTitle;
+		}
 	}
 
 	return [
 		'user_id'	=> $userId,
 		'chat_id'	=> $chatId,
-		'title'		=> empty($titleNew)? $data[$chatId]['title'] : $titleNew
+		'title'		=> $data[$chatId]['title'],
 	];
 }
 
@@ -382,22 +385,9 @@ function chatsDataItems($data) {
 
 function prepareChatTitle($title) {
 
-	$chars = [
-		null,
-		'"',
-		null,
-		"'",
-		null,
-		'"',
-		null,
-		"'",
-		'.',
-		':',
-		'.',
-		':',
-		'.',
-	];
+	$title = str_replace(['"', '"'], '', $title);
 
+	$chars = [null, '.', null, ':', null];
 	foreach ($chars as $char) {
 		$title = isset($char) ? trim($title, $char) : trim($title);
 	}
