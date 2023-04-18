@@ -745,13 +745,38 @@ $(function() {
 
 
 
-	function loadChat($content, chatId, statusUrl) {
+	function loadChat($content, chatId) {
+
+		$content.addClass('chat-content-loading');
+
+		const data = {
+			action	: 'chat',
+			user_id	: userId,
+			chat_id	: chatId,
+		};
+
+		$.post(chatConfig.serverUrl, data, function(e) {
+
+			if (!e || !e.status_url) {
+				$content.removeClass('chat-content-loading');
+				return;
+			}
+
+			loadChatJson($content, chatId, e.status_url);
+
+		}).fail(function() {
+			$content.removeClass('chat-content-loading');
+		});
+
+	}
+
+
+
+	function loadChatJson($content, chatId, statusUrl) {
 
 		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
 		$content.removeAttr('data-stop-url');
-
-		$content.addClass('chat-content-loading');
 
 		$.get(statusUrl, function(e) {
 
