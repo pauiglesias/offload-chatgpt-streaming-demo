@@ -636,8 +636,7 @@ $(function() {
 
 		regenerative($content, false);
 
-		if ('' === lastUserMessage ||
-			!$content.attr('data-from-status-url')) {
+		if ('' === lastUserMessage) {
 			return;
 		}
 
