@@ -9,8 +9,8 @@ $(function() {
 	let autoscroll = false;
 	let autoscrollDiv = null;
 
-	let lastMessage = '';
-	let fromStatusUrl = null;
+	let prevStatusUrl = '';
+	let lastUserMessage = '';
 
 
 
@@ -78,15 +78,9 @@ $(function() {
 		const $div = addMessage($content, input, 'input');
 		$div.addClass('chat-messages-input-wait');
 
-		lastMessage = message;
-		fromStatusUrl = $content.attr('data-status-url') ? $content.attr('data-status-url') : null;
-
 		autoscroll = true;
 		scrollBottom($content);
 		sendMessage($content, $div, message);
-
-/* // Debug point
-blinkEnd(addMessage($content, message, 'output')); */
 	}
 
 
@@ -105,7 +99,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 
 
-	function sendMessage($content, $inputDiv, message, statusUrl) {
+	function sendMessage($content, $inputDiv, message) {
 
 		const chat = getChat($content);
 
@@ -114,7 +108,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 			user_id			: userId,
 			chat_id			: chat.id,
 			message			: message,
-			from_status_url	: fromStatusUrl
+			from_status_url	: prevStatusUrl
 		};
 
 		const $input = $content.find('.chat-input-text textarea');
@@ -147,6 +141,9 @@ blinkEnd(addMessage($content, message, 'output')); */
 			if (chat.new) {
 				$content.attr('data-chat-id', chat.id);
 			}
+
+			lastUserMessage = message;
+			prevStatusUrl = $content.attr('data-status-url') ? $content.attr('data-status-url') : '';
 
 			statusUrl = e.response.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
@@ -265,6 +262,8 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		unreadyInputButton($input);
 		enableInputButton($content, true);
+
+		$content.removeAttr('data-stop-url');
 	}
 
 
@@ -596,9 +595,6 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function stopStreaming($content) {
 
-		setStreaming($content, false);
-		lastMessageItem($content).attr('data-stopped', true);
-
 		const stopUrl = $content.attr('data-stop-url');
 		if (!stopUrl) {
 			return;
@@ -610,15 +606,10 @@ blinkEnd(addMessage($content, message, 'output')); */
 				return;
 			}
 
-			const statusUrl = $content.attr('data-status-url');
-			if (fromStatusUrl && statusUrl == fromStatusUrl) {
-				return;
-			}
-
-			$content.attr('data-status-url', fromStatusUrl);
+			setStreaming($content, false);
+			lastMessageItem($content).attr('data-stopped', true);
 
 		});
-
 	}
 
 
@@ -634,7 +625,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		regenerative($content, false);
 
-		if ('' === lastMessage) {
+		if ('' === lastUserMessage) {
 			return;
 		}
 
@@ -652,13 +643,15 @@ blinkEnd(addMessage($content, message, 'output')); */
 			$inputDiv.addClass('chat-messages-input-wait');
 		}
 
+		$content.attr('data-status-url', prevStatusUrl ? prevStatusUrl : '');
+
 		setStreaming($content, true);
 		enableInputButton($content, false);
 		unreadyInputButton($content.find('.chat-input-text textarea'), true);
 
 		autoscroll = true;
 		scrollBottom($content);
-		sendMessage($content, $inputDiv, lastMessage);
+		sendMessage($content, $inputDiv, lastUserMessage);
 	}
 
 
@@ -672,7 +665,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	$(document).on('click', '.chat-sidebar-new', function() {
 
-		fromStatusUrl = null;
+		prevStatusUrl = null;
 
 		const $content = $(this).closest('.chat').find('.chat-content');
 
@@ -698,8 +691,6 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 		$(this).closest('.chat-sidebar-list').find('.chat-sidebar-item').removeClass('chat-sidebar-selected').removeClass('chat-sidebar-loading');
 		$(this).addClass('chat-sidebar-loading');
-
-		$content.addClass('chat-content-loading');
 
 		enableInputButton($content, false);
 		loadChat($content, $(this).attr('data-chat-id'), $(this).attr('data-status-url'));
@@ -748,33 +739,29 @@ blinkEnd(addMessage($content, message, 'output')); */
 
 	function loadChat($content, chatId, statusUrl) {
 
-		fromStatusUrl = null;
+		prevStatusUrl = statusUrl;
+
 		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
+		$content.removeAttr('data-stop-url');
+
+		$content.addClass('chat-content-loading');
 
 		$.get(statusUrl, function(e) {
 
 			if (chatId != $content.attr('data-chat-id') ||
 				statusUrl != $content.attr('data-status-url')) {
-				$content.removeClass('chat-content-loading');
 				return;
 			}
 
 			if (!e || !e.status || !['done', 'stop'].includes(e.status)) {
-				$content.removeClass('chat-content-loading');
 				return;
 			}
 
 			if (!e.parameters ||
 				!e.parameters.messages ||
 				!e.parameters.messages.length) {
-				$content.removeClass('chat-content-loading');
 				return;
-			}
-
-			if (e.endpoints &&
-				e.endpoints.from_status_url) {
-				fromStatusUrl = e.endpoints.from_status_url;
 			}
 
 			$content.find('.chat-messages').html('');
@@ -791,7 +778,7 @@ blinkEnd(addMessage($content, message, 'output')); */
 				if ('' !== content) {
 
 					if ('user' == message.role) {
-						lastMessage = content;
+						lastUserMessage = content;
 					}
 
 					const input = prepareOutput(escapeHtml(content), '');
@@ -812,12 +799,11 @@ blinkEnd(addMessage($content, message, 'output')); */
 				}
 			}
 
-			$content.removeClass('chat-content-loading');
-			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
-
 			regenerative($content, true);
 
 		}).always(function() {
+			$content.removeClass('chat-content-loading');
+			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
 			streaming || enableInputButton($content, true);
 		});
 	}
