@@ -102,6 +102,7 @@ $(function() {
 	function sendMessage($content, $inputDiv, message) {
 
 		const chat = getChat($content);
+		const timestampId = timestamp($content);
 
 		const data = {
 			action			: 'stream',
@@ -115,7 +116,8 @@ $(function() {
 
 		$.post(chatConfig.serverUrl, data, function(e) {
 
-			if (!streaming) {
+			if (!streaming ||
+				!timestamp($content, timestampId)) {
 				return;
 			}
 
@@ -173,13 +175,13 @@ $(function() {
 	function streamMessages($content, $div, $input, url) {
 
 		let html = '';
-
+		const timestampId = timestamp($content);
 		const eventSource = new EventSource(url);
 
 		eventSource.onmessage = function(e) {
 
-			if (!streaming) {
-				streamMessagesEnd($content, $div, $input, eventSource, html);
+			if (!streaming ||
+				!timestamp($content, timestampId)) {
 				return;
 			}
 
@@ -220,7 +222,14 @@ $(function() {
 		}
 
 		eventSource.onerror = function(e) {
+
 			console.log(e);
+
+			if (!streaming ||
+				!timestamp($content, timestampId)) {
+				return;
+			}
+
 			streamMessagesEnd($content, $div, $input, eventSource, html);
 		}
 	}
@@ -747,6 +756,8 @@ $(function() {
 
 	function loadChat($content, chatId) {
 
+		const timestampId = timestamp($content);
+
 		$content.addClass('chat-content-loading');
 
 		const data = {
@@ -756,6 +767,10 @@ $(function() {
 		};
 
 		$.post(chatConfig.serverUrl, data, function(e) {
+
+			if (!timestamp($content, timestampId)) {
+				return;
+			}
 
 			if (!e || !e.status_url) {
 				$content.removeClass('chat-content-loading');
@@ -774,11 +789,17 @@ $(function() {
 
 	function loadChatJson($content, chatId, statusUrl) {
 
+		const timestampId = timestamp($content);
+
 		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
 		$content.removeAttr('data-stop-url');
 
 		$.get(statusUrl, function(e) {
+
+			if (!timestamp($content, timestampId)) {
+				return;
+			}
 
 			if (chatId != $content.attr('data-chat-id') ||
 				statusUrl != $content.attr('data-status-url')) {
@@ -836,6 +857,11 @@ $(function() {
 			regenerative($content, true);
 
 		}).always(function() {
+
+			if (!timestamp($content, timestampId)) {
+				return;
+			}
+
 			$content.removeClass('chat-content-loading');
 			streaming || enableInputButton($content, true);
 		});
@@ -900,6 +926,19 @@ $(function() {
 			id  : uniqueId(),
 			new : true
 		};
+	}
+
+
+
+	function timestamp($content, timestampId) {
+
+		if (timestampId) {
+			return timestampId === parseInt($content.attr('data-timestamp'), 10);
+		}
+
+		const timestampNow = new Date().getTime();
+		$content.attr('data-timestamp', timestampNow);
+		return timestampNow;
 	}
 
 
