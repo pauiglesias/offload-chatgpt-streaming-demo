@@ -294,7 +294,8 @@ function removeChatResponse($userId, $chatId) {
 
 function removeChatData($userId, $chatId) {
 
-	if (empty($chatId)) {
+	if (empty($userId) ||
+		empty($chatId)) {
 		return null;
 	}
 
@@ -318,7 +319,51 @@ function removeChatData($userId, $chatId) {
 
 
 /**
- * User chat list
+ * Single Chat
+ */
+
+
+
+function chat() {
+	$userId = empty($_POST['user_id'])	? null : $_POST['user_id'];
+	$chatId = empty($_POST['chat_id'])	? null : $_POST['chat_id'];
+	chatResponse($userId, $chatId);
+}
+
+
+
+function chatResponse($userId, $chatId) {
+	header('Content-Type: application/json');
+	echo json_encode(chatResponseData($userId, $chatId), JSON_UNESCAPED_SLASHES);
+	die;
+}
+
+
+
+function chatResponseData($userId, $chatId) {
+
+	if (empty($userId) ||
+		empty($chatId)) {
+		return null;
+	}
+
+	$data = loadUserData($userId);
+	if (!isset($data[$chatId])) {
+		return null;
+	}
+
+	return [
+		'user_id'		=> $userId,
+		'chat_id'		=> $chatId,
+		'title'			=> $data[$chatId]['title'],
+		'status_url' 	=> $data[$chatId]['status_url'],
+	];
+}
+
+
+
+/**
+ * Chats list
  */
 
 
@@ -453,6 +498,11 @@ function postRequest() {
 
 	if ('remove' == $_POST['action']) {
 		removeChat();
+		return;
+	}
+
+	if ('chat' == $_POST['action']) {
+		chat();
 		return;
 	}
 
