@@ -13,5 +13,4 @@ data.json
 .env.00
 /.idea
 /.vscode
-/data/*
-!/data/index.php
+/data
