@@ -11,24 +11,23 @@
 
 
 function streamRequest() {
-	$userId 		= empty($_POST['user_id'])			? null : $_POST['user_id'];
-	$chatId 		= empty($_POST['chat_id'])			? null : $_POST['chat_id'];
 	$message		= empty($_POST['message'])			? null : $_POST['message'];
-	$fromStatusUrl 	= empty($_POST['from_status_url'])	? null  : $_POST['from_status_url'];
-	streamRequestOutput($userId, $chatId, $message, $fromStatusUrl);
+	$fromStatusUrl 	= empty($_POST['from_status_url'])	? null : $_POST['from_status_url'];
+	$conversationId	= empty($_POST['conversation_id'])	? null : $_POST['conversation_id'];
+	streamRequestOutput($message, $fromStatusUrl, $conversationId);
 }
 
 
 
-function streamRequestOutput($userId, $chatId, $message, $fromStatusUrl) {
+function streamRequestOutput($message, $fromStatusUrl, $conversationId) {
 	header('Content-Type: application/json');
-	echo json_encode(streamRequestData($userId, $chatId, $message, $fromStatusUrl), JSON_UNESCAPED_SLASHES);
+	echo json_encode(streamRequestData($message, $fromStatusUrl, $conversationId), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
 
 
-function streamRequestData($userId, $chatId, $message, $fromStatusUrl) {
+function streamRequestData($message, $fromStatusUrl, $conversationId) {
 
 	if (empty($message)) {
 		return null;
@@ -44,12 +43,11 @@ function streamRequestData($userId, $chatId, $message, $fromStatusUrl) {
 		$args['from_status_url'] = $fromStatusUrl;
 	}
 
-	return [
-		'user_id'			=> $userId,
-		'chat_id'			=> $chatId,
-		'from_status_url'	=> $fromStatusUrl,
-		'response'			=> remoteRequest($args, '/stream-chatgpt'),
-	];
+	if (!empty($conversationId)) {
+		$args['conversation_id'] = $conversationId;
+	}
+
+	return remoteRequest($args, '/stream-chatgpt');
 }
 
 
