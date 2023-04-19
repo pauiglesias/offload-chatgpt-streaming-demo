@@ -730,8 +730,17 @@ $(function() {
 
 
 	function resetChatMessages($content) {
+
 		$content.find('.chat-messages').html('');
-		$content.removeAttr('data-conversation-id').removeAttr('data-status-url').removeAttr('data-stop-url');
+
+		$content.removeAttr('data-watermark')
+				.removeAttr('data-conversation-id')
+				.removeAttr('data-status-url')
+				.removeAttr('data-from-status-url')
+				.removeAttr('data-from-status-url-prev')
+				.removeAttr('data-stop-url')
+				.removeClass('chat-awaiting');
+
 		enableInputButton($content, false);
 	}
 
@@ -782,8 +791,8 @@ $(function() {
 
 		const watermarkId = watermark($content);
 
-		$content.attr('data-status-url', statusUrl);
 		$content.attr('data-conversation-id', chatId);
+		$content.attr('data-status-url', statusUrl);
 		$content.removeAttr('data-stop-url');
 
 		$.get(statusUrl, function(e) {
