@@ -100,15 +100,13 @@ $(function() {
 
 	function sendMessage($content, $inputDiv, message) {
 
-		const chat = getChat($content);
 		const watermarkId = watermark($content);
 
 		const data = {
 			action			: 'stream',
-			user_id			: userId,
-			chat_id			: chat.id,
 			message			: message,
-			from_status_url	: $content.attr('data-status-url') || ''
+			from_status_url	: $content.attr('data-status-url') || '',
+			conversation_id	: $content.attr('data-conversation-id') || ''
 		};
 
 		const $input = $content.find('.chat-input-text textarea');
@@ -120,14 +118,14 @@ $(function() {
 				return;
 			}
 
-			if (!e || !e.response || !e.response.status) {
+			if (!e || !e.status) {
 				setStreaming($content, false);
 				unreadyInputButton($input);
 				enableInputButton($content, true);
 				return;
 			}
 
-			if ('success' != e.response.status) {
+			if ('success' != e.status) {
 				setStreaming($content, false);
 				unreadyInputButton($input);
 				enableInputButton($content, true);
@@ -136,11 +134,12 @@ $(function() {
 
 			lastUserMessage = message;
 
-			chat.new && $content.attr('data-chat-id', chat.id);
+			const conversationId = data.conversation_id ? data.conversation_id : e.conversation_id;
+			$content.attr('data-conversation-id', conversationId);
 
-			statusUrl = e.response.endpoints.status_url;
+			statusUrl = e.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
-			$content.attr('data-stop-url', e.response.endpoints.stop_url ? e.response.endpoints.stop_url : '');
+			$content.attr('data-stop-url', e.endpoints.stop_url ? e.endpoints.stop_url : '');
 
 			$content.attr('data-from-status-url-prev', $content.attr('data-from-status-url') || '');
 			$content.attr('data-from-status-url', data.from_status_url);
@@ -149,8 +148,8 @@ $(function() {
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			saveChat($content, chat.id, statusUrl, message, chat.new);
-			streamMessages($content, $div, $input, e.response.endpoints.stream_events_url);
+			saveChat($content, conversationId, statusUrl, message, !data.conversation_id);
+			streamMessages($content, $div, $input, e.endpoints.stream_events_url);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -269,6 +268,48 @@ $(function() {
 
 		$content.removeAttr('data-stop-url');
 	}
+
+
+
+	function regenerateMessage($content) {
+
+		regenerative($content, false);
+
+		if ('' === lastUserMessage) {
+			return;
+		}
+
+		let $last = lastMessageItem($content);
+
+		if ($last && (
+			$last.attr('data-stopped') || $last.hasClass('chat-messages-output'))) {
+			$last.remove();
+			$last = lastMessageItem($content);
+		}
+
+		let $inputDiv = null;
+		if ($last && $last.hasClass('chat-messages-input')) {
+			$inputDiv = $last;
+			$inputDiv.addClass('chat-messages-input-wait');
+		}
+
+		setStreaming($content, true);
+		enableInputButton($content, false);
+		unreadyInputButton($content.find('.chat-input-text textarea'), true);
+
+		$content.attr('data-status-url', $content.attr('data-from-status-url'));
+
+		autoscroll = true;
+		scrollBottom($content);
+		sendMessage($content, $inputDiv, lastUserMessage);
+	}
+
+
+
+	$('.chat-input-regenerate').click(function() {
+		regenerateMessage($(this).closest('.chat-content'));
+		return false;
+	});
 
 
 
@@ -537,8 +578,8 @@ $(function() {
 			addChatList($content.closest('.chat'), chatId, e.title, true);
 			$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
 
-			if (chatId != $content.attr('data-chat-id') ||
-				statusUrl != $content.attr('data-chat-id')) {
+			if (chatId != $content.attr('data-conversation-id') ||
+				statusUrl != $content.attr('data-status-url')) {
 				return;
 			}
 
@@ -632,48 +673,6 @@ $(function() {
 
 
 
-	function regenerateMessage($content) {
-
-		regenerative($content, false);
-
-		if ('' === lastUserMessage) {
-			return;
-		}
-
-		let $last = lastMessageItem($content);
-
-		if ($last && (
-			$last.attr('data-stopped') || $last.hasClass('chat-messages-output'))) {
-			$last.remove();
-			$last = lastMessageItem($content);
-		}
-
-		let $inputDiv = null;
-		if ($last && $last.hasClass('chat-messages-input')) {
-			$inputDiv = $last;
-			$inputDiv.addClass('chat-messages-input-wait');
-		}
-
-		setStreaming($content, true);
-		enableInputButton($content, false);
-		unreadyInputButton($content.find('.chat-input-text textarea'), true);
-
-		$content.attr('data-status-url', $content.attr('data-from-status-url'));
-
-		autoscroll = true;
-		scrollBottom($content);
-		sendMessage($content, $inputDiv, lastUserMessage);
-	}
-
-
-
-	$('.chat-input-regenerate').click(function() {
-		regenerateMessage($(this).closest('.chat-content'));
-		return false;
-	});
-
-
-
 	$(document).on('click', '.chat-sidebar-new', function() {
 
 		const $content = $(this).closest('.chat').find('.chat-content');
@@ -702,7 +701,7 @@ $(function() {
 		$(this).addClass('chat-sidebar-loading');
 
 		enableInputButton($content, false);
-		loadChat($content, $(this).attr('data-chat-id'), $(this).attr('data-status-url'));
+		loadChat($content, $(this).attr('data-chat-id'));
 
 		return false;
 	});
@@ -732,7 +731,7 @@ $(function() {
 
 	function resetChatMessages($content) {
 		$content.find('.chat-messages').html('');
-		$content.removeAttr('data-chat-id').removeAttr('data-status-url').removeAttr('data-stop-url');
+		$content.removeAttr('data-conversation-id').removeAttr('data-status-url').removeAttr('data-stop-url');
 		enableInputButton($content, false);
 	}
 
@@ -783,8 +782,8 @@ $(function() {
 
 		const watermarkId = watermark($content);
 
-		$content.attr('data-chat-id', chatId);
 		$content.attr('data-status-url', statusUrl);
+		$content.attr('data-conversation-id', chatId);
 		$content.removeAttr('data-stop-url');
 
 		$.get(statusUrl, function(e) {
@@ -896,25 +895,6 @@ $(function() {
 
 		});
 
-	}
-
-
-
-	function getChat($content) {
-
-		const chat = {
-			id  : $content.attr('data-chat-id'),
-			new : false
-		};
-
-		if (chat.id) {
-			return chat;
-		}
-
-		return {
-			id  : uniqueId(),
-			new : true
-		};
 	}
 
 
