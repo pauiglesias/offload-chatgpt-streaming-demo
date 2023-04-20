@@ -578,7 +578,8 @@ $(function() {
 		$.post(chatConfig.serverUrl, data, function(e) {
 			newChatListItem($content, chatId, statusUrl, e && e.title ? e.title : titleFallback);
 
-		}).error(function() {
+		}).fail(function(e) {
+			console.log(e);
 			newChatListItem($content, chatId, statusUrl, titleFallback);
 		});
 	}
@@ -649,7 +650,8 @@ $(function() {
 
 			updateChatTitle($content, chatId, statusUrl, e.response.body.choices[0].message.content, titleFallback);
 
-		}).error(function() {
+		}).fail(function(e) {
+			console.log(e);
 			newChatListItem($content, chatId, statusUrl, titleFallback);
 		});
 	}
