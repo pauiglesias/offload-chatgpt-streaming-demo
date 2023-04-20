@@ -141,8 +141,6 @@ $(function() {
 			const statusUrl = e.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
 			$content.attr('data-stop-url', e.endpoints.stop_url ? e.endpoints.stop_url : '');
-
-			$content.attr('data-from-status-url-prev', $content.attr('data-from-status-url') || '');
 			$content.attr('data-from-status-url', data.from_status_url);
 
 			const bearerToken = e.endpoints.bearer_token || '';
@@ -228,6 +226,7 @@ $(function() {
 
 			if (!streaming ||
 				!watermark($content, watermarkId)) {
+				eventSource.close();
 				return;
 			}
 
@@ -671,7 +670,6 @@ $(function() {
 			return;
 		}
 
-		const watermarkId = watermark($content);
 		const bearerToken = $content.attr('data-bearer-token') || '';
 
 		$.ajax({
@@ -686,7 +684,7 @@ $(function() {
 
 		}).done(function(e) {
 
-			if (!watermark($content, watermarkId)) {
+			if (stopUrl !== $content.attr('data-stop-url')) {
 				return;
 			}
 
@@ -696,6 +694,7 @@ $(function() {
 
 			setStreaming($content, false);
 			lastMessageItem($content).attr('data-stopped', true);
+			regenerative($content, true);
 
 		});
 	}
@@ -773,7 +772,6 @@ $(function() {
 				.removeAttr('data-conversation-id')
 				.removeAttr('data-status-url')
 				.removeAttr('data-from-status-url')
-				.removeAttr('data-from-status-url-prev')
 				.removeAttr('data-stop-url')
 				.removeAttr('data-bearer-token')
 				.removeClass('chat-awaiting');
