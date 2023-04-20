@@ -137,15 +137,16 @@ $(function() {
 			const conversationId = data.conversation_id ? data.conversation_id : e.conversation_id;
 			$content.attr('data-conversation-id', conversationId);
 
-			const bearerToken = e.endpoints.bearer_token || '';
-			const streamToken = e.endpoints.stream_token || '';
-
 			const statusUrl = e.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
 			$content.attr('data-stop-url', e.endpoints.stop_url ? e.endpoints.stop_url : '');
 
 			$content.attr('data-from-status-url-prev', $content.attr('data-from-status-url') || '');
 			$content.attr('data-from-status-url', data.from_status_url);
+
+			const bearerToken = e.endpoints.bearer_token || '';
+			const streamToken = e.endpoints.stream_token || '';
+			$content.attr('data-bearer-token', bearerToken);
 
 			$inputDiv && $inputDiv.removeClass('chat-messages-input-wait');
 			const $div = addMessage($content, squareCursor(true), 'output');
@@ -752,6 +753,7 @@ $(function() {
 				.removeAttr('data-from-status-url')
 				.removeAttr('data-from-status-url-prev')
 				.removeAttr('data-stop-url')
+				.removeAttr('data-bearer-token')
 				.removeClass('chat-awaiting');
 
 		enableInputButton($content, false);
@@ -805,8 +807,8 @@ $(function() {
 		const watermarkId = watermark($content);
 
 		$content.attr('data-conversation-id', chatId);
-		$content.attr('data-bearer-token', bearerToken);
 		$content.attr('data-status-url', statusUrl);
+		$content.attr('data-bearer-token', bearerToken);
 		$content.removeAttr('data-stop-url');
 
 		$.ajax({
