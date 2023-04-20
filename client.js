@@ -797,17 +797,17 @@ $(function() {
 		const watermarkId = watermark($content);
 
 		$content.attr('data-conversation-id', chatId);
+		$content.attr('data-bearer-token', bearerToken);
 		$content.attr('data-status-url', statusUrl);
 		$content.removeAttr('data-stop-url');
 
-		const headers = {};
-		if (bearerToken) {
-			headers['Authorization'] = 'Bearer ' + bearerToken;
-		}
-
-		$.ajax(statusUrl, {
-			method: 'GET',
-			headers: headers,
+		$.ajax({
+			url: statusUrl,
+			beforeSend: function(xhr) {
+				if (bearerToken) {
+					xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken);
+				}
+			}
 
 		}).done(function(e) {
 
@@ -815,57 +815,7 @@ $(function() {
 				return;
 			}
 
-			if (!e || !e.status) {
-				return;
-			}
-
-			if (!e.parameters ||
-				!e.parameters.messages ||
-				!e.parameters.messages.length) {
-				return;
-			}
-
-			$content.attr('data-from-status-url', e.endpoints && e.endpoints.from_status_url ? e.endpoints.from_status_url : '');
-
-			$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
-
-			$content.find('.chat-messages').html('');
-			$content.find('.chat-messages').scrollTop(0);
-
-			for (const message of e.parameters.messages) {
-
-				if (!message.role || !message.content ||
-					!['user', 'assistant'].includes(message.role)) {
-					continue;
-				}
-
-				const content = '' + message.content.trim();
-				if ('' !== content) {
-
-					if ('user' == message.role) {
-						lastUserMessage = content;
-					}
-
-					const input = prepareOutput(escapeHtml(content), '');
-					addMessage($content, input, 'user' == message.role ? 'input' : 'output');
-				}
-			}
-
-			if (['done', 'stop', 'stream'].includes(e.status) &&
-				e.response &&
-				e.response.body &&
-				e.response.body.choices &&
-				e.response.body.choices[0].message &&
-				e.response.body.choices[0].message.content) {
-
-				const content = '' + e.response.body.choices[0].message.content;
-				if ('' !== content) {
-					const output = prepareOutput(escapeHtml(content), '');
-					addMessage($content, output, 'output');
-				}
-			}
-
-			regenerative($content, true);
+			onLoadChatJson(e, $content, chatId);
 
 		}).always(function() {
 
@@ -876,6 +826,63 @@ $(function() {
 			$content.removeClass('chat-content-loading');
 			streaming || enableInputButton($content, true);
 		});
+	}
+
+
+
+	function onLoadChatJson(e, $content, chatId) {
+
+		if (!e || !e.status) {
+			return;
+		}
+
+		if (!e.parameters ||
+			!e.parameters.messages ||
+			!e.parameters.messages.length) {
+			return;
+		}
+
+		$content.attr('data-from-status-url', e.endpoints && e.endpoints.from_status_url ? e.endpoints.from_status_url : '');
+
+		$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
+
+		$content.find('.chat-messages').html('');
+		$content.find('.chat-messages').scrollTop(0);
+
+		for (const message of e.parameters.messages) {
+
+			if (!message.role || !message.content ||
+				!['user', 'assistant'].includes(message.role)) {
+				continue;
+			}
+
+			const content = '' + message.content.trim();
+			if ('' !== content) {
+
+				if ('user' == message.role) {
+					lastUserMessage = content;
+				}
+
+				const input = prepareOutput(escapeHtml(content), '');
+				addMessage($content, input, 'user' == message.role ? 'input' : 'output');
+			}
+		}
+
+		if (['done', 'stop', 'stream'].includes(e.status) &&
+			e.response &&
+			e.response.body &&
+			e.response.body.choices &&
+			e.response.body.choices[0].message &&
+			e.response.body.choices[0].message.content) {
+
+			const content = '' + e.response.body.choices[0].message.content;
+			if ('' !== content) {
+				const output = prepareOutput(escapeHtml(content), '');
+				addMessage($content, output, 'output');
+			}
+		}
+
+		regenerative($content, true);
 	}
 
 
