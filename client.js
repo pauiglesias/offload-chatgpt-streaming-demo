@@ -137,7 +137,10 @@ $(function() {
 			const conversationId = data.conversation_id ? data.conversation_id : e.conversation_id;
 			$content.attr('data-conversation-id', conversationId);
 
-			statusUrl = e.endpoints.status_url;
+			const bearerToken = e.endpoints.bearer_token || '';
+			const streamToken = e.endpoints.stream_token || '';
+
+			const statusUrl = e.endpoints.status_url;
 			$content.attr('data-status-url', statusUrl);
 			$content.attr('data-stop-url', e.endpoints.stop_url ? e.endpoints.stop_url : '');
 
@@ -148,8 +151,8 @@ $(function() {
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			saveChat($content, conversationId, statusUrl, message, !data.conversation_id);
-			streamMessages($content, $div, $input, e.endpoints.stream_events_url);
+			saveChat($content, conversationId, bearerToken, statusUrl, message, !data.conversation_id);
+			streamMessages($content, $div, $input, streamToken, e.endpoints.stream_events_url);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -162,11 +165,12 @@ $(function() {
 
 
 
-	function streamMessages($content, $div, $input, url) {
+	function streamMessages($content, $div, $input, streamToken, url) {
 
 		let html = '';
 		const watermarkId = watermark($content);
-		const eventSource = new EventSource(url);
+
+		const eventSource = new EventSource(url + (streamToken ? '?stream_token=' + streamToken : ''));
 
 		eventSource.onmessage = function(e) {
 
@@ -530,14 +534,15 @@ $(function() {
 
 
 
-	function saveChat($content, chatId, statusUrl, message, newChat) {
+	function saveChat($content, chatId, bearerToken, statusUrl, message, newChat) {
 
 		const data = {
-			action		: 'save',
-			user_id		: userId,
-			chat_id		: chatId,
-			message		: message,
-			status_url	: statusUrl,
+			action			: 'save',
+			user_id			: userId,
+			chat_id			: chatId,
+			message			: message,
+			bearer_token	: bearerToken,
+			status_url		: statusUrl,
 		};
 
 		$.post(chatConfig.serverUrl, data, function(e) {
@@ -777,7 +782,7 @@ $(function() {
 				return;
 			}
 
-			loadChatJson($content, chatId, e.status_url);
+			loadChatJson($content, chatId, e.bearer_token, e.status_url);
 
 		}).fail(function() {
 			$content.removeClass('chat-content-loading');
@@ -787,7 +792,7 @@ $(function() {
 
 
 
-	function loadChatJson($content, chatId, statusUrl) {
+	function loadChatJson($content, chatId, bearerToken, statusUrl) {
 
 		const watermarkId = watermark($content);
 
@@ -795,7 +800,16 @@ $(function() {
 		$content.attr('data-status-url', statusUrl);
 		$content.removeAttr('data-stop-url');
 
-		$.get(statusUrl, function(e) {
+		const headers = {};
+		if (bearerToken) {
+			headers['Authorization'] = 'Bearer ' + bearerToken;
+		}
+
+		$.ajax(statusUrl, {
+			method: 'GET',
+			headers: headers,
+
+		}).done(function(e) {
 
 			if (!watermark($content, watermarkId)) {
 				return;

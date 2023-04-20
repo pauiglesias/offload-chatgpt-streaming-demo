@@ -112,24 +112,25 @@ function remoteRequestOptionsArgs($args = []) {
 
 
 function saveChat() {
-	$userId 	= empty($_POST['user_id'])		? null : $_POST['user_id'];
-	$chatId 	= empty($_POST['chat_id'])		? null : $_POST['chat_id'];
-	$message	= empty($_POST['message'])		? null : $_POST['message'];
-	$statusUrl 	= empty($_POST['status_url'])	? null : $_POST['status_url'];
-	saveChatResponse($userId, $chatId, $message, $statusUrl);
+	$userId 		= empty($_POST['user_id'])		? null : $_POST['user_id'];
+	$chatId 		= empty($_POST['chat_id'])		? null : $_POST['chat_id'];
+	$message		= empty($_POST['message'])		? null : $_POST['message'];
+	$bearerToken	= empty($_POST['bearer_token'])	? null : $_POST['bearer_token'];
+	$statusUrl 		= empty($_POST['status_url'])	? null : $_POST['status_url'];
+	saveChatResponse($userId, $chatId, $message, $bearerToken, $statusUrl);
 }
 
 
 
-function saveChatResponse($userId, $chatId, $message, $statusUrl) {
+function saveChatResponse($userId, $chatId, $message, $bearerToken, $statusUrl) {
 	header('Content-Type: application/json');
-	echo json_encode(saveChatData($userId, $chatId, $message, $statusUrl), JSON_UNESCAPED_SLASHES);
+	echo json_encode(saveChatData($userId, $chatId, $message, $bearerToken, $statusUrl), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
 
 
-function saveChatData($userId, $chatId, $message, $statusUrl) {
+function saveChatData($userId, $chatId, $message, $bearerToken, $statusUrl) {
 
 	if (empty($userId) ||
 		empty($chatId) ||
@@ -153,8 +154,9 @@ function saveChatData($userId, $chatId, $message, $statusUrl) {
 		$titleStatusUrl = chatTitleStatusUrl($message);
 	}
 
-	$data[$chatId]['updated'] = time();
-	$data[$chatId]['status_url'] = $statusUrl;
+	$data[$chatId]['updated']		= time();
+	$data[$chatId]['bearer_token']	= $bearerToken;
+	$data[$chatId]['status_url']	= $statusUrl;
 
 	if (!saveUserData($userId, $data)) {
 		return null;
@@ -362,6 +364,7 @@ function chatResponseData($userId, $chatId) {
 		'user_id'		=> $userId,
 		'chat_id'		=> $chatId,
 		'title'			=> $data[$chatId]['title'],
+		'bearer_token'	=> $data[$chatId]['bearer_token'],
 		'status_url' 	=> $data[$chatId]['status_url'],
 	];
 }
