@@ -552,7 +552,7 @@ $(function() {
 			}
 
 			if (e.title_status_url) {
-				waitForChatTitleUrl($content, data.chat_id, data.status_url, e.title_status_url);
+				waitForChatTitleUrl($content, data.chat_id, data.status_url, e.title_bearer_token, e.title_status_url, e.title);
 				return;
 			}
 
@@ -565,7 +565,7 @@ $(function() {
 
 
 
-	function updateChatTitle($content, chatId, statusUrl, title) {
+	function updateChatTitle($content, chatId, statusUrl, title, titleFallback) {
 
 		const data = {
 			action		: 'title',
@@ -575,23 +575,27 @@ $(function() {
 		};
 
 		$.post(chatConfig.serverUrl, data, function(e) {
+			newChatListItem($content, chatId, statusUrl, e && e.title ? e.title : titleFallback);
 
-			if (!e || !e.title) {
-				return;
-			}
-
-			addChatList($content.closest('.chat'), chatId, e.title, true);
-			$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
-
-			if (chatId != $content.attr('data-conversation-id') ||
-				statusUrl != $content.attr('data-status-url')) {
-				return;
-			}
-
-			$list.find('.chat-sidebar-item[data-chat-id="' + chatId + '"]').addClass('chat-sidebar-selected');
-			$list.scrollTop(0);
-
+		}).error(function() {
+			newChatListItem($content, chatId, statusUrl, titleFallback);
 		});
+	}
+
+
+
+	function newChatListItem($content, chatId, statusUrl, title) {
+
+		addChatList($content.closest('.chat'), chatId, title, true);
+
+		if (chatId != $content.attr('data-conversation-id') ||
+			statusUrl != $content.attr('data-status-url')) {
+			return;
+		}
+
+		$list = $content.closest('.chat').find('.chat-sidebar .chat-sidebar-list');
+		$list.find('.chat-sidebar-item[data-chat-id="' + chatId + '"]').addClass('chat-sidebar-selected');
+		$list.scrollTop(0);
 	}
 
 
@@ -604,31 +608,31 @@ $(function() {
 
 
 
-	function waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl) {
-		setTimeout(fetchTitleUrl, 500, $content, chatId, statusUrl, titleStatusUrl);
+	function waitForChatTitleUrl($content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback) {
+		setTimeout(fetchTitleUrl, 500, $content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback);
 	}
 
 
 
-	function fetchTitleUrl($content, chatId, statusUrl, titleStatusUrl) {
+	function fetchTitleUrl($content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback) {
 
-		if (statusUrl != $content.attr('data-status-url')) {
-			return;
-		}
-
-		$.get(titleStatusUrl, function(e) {
-
-			if (statusUrl != $content.attr('data-status-url')) {
-				return;
+		$.ajax({
+			url: titleStatusUrl,
+			beforeSend: function(xhr) {
+				if (titleBearerToken) {
+					xhr.setRequestHeader('Authorization', 'Bearer ' + titleBearerToken);
+				}
 			}
 
+		}).done(function(e) {
+
 			if (!e || !e.status || 'error' == e.status) {
-				updateChatTitle($content, chatId, statusUrl, null);
+				newChatListItem($content, chatId, statusUrl, titleFallback);
 				return;
 			}
 
 			if ('done' != e.status) {
-				waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl);
+				waitForChatTitleUrl($content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback);
 				return;
 			}
 
@@ -637,11 +641,15 @@ $(function() {
 				!e.response.body.choices ||
 				!e.response.body.choices[0].message ||
 				!e.response.body.choices[0].message.content) {
-				updateChatTitle($content, chatId, statusUrl, null);
+
+				newChatListItem($content, chatId, statusUrl, titleFallback);
+				return;
 			}
 
-			updateChatTitle($content, chatId, statusUrl, e.response.body.choices[0].message.content);
+			updateChatTitle($content, chatId, statusUrl, e.response.body.choices[0].message.content, titleFallback);
 
+		}).error(function() {
+			newChatListItem($content, chatId, statusUrl, titleFallback);
 		});
 	}
 

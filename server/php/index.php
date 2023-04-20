@@ -142,6 +142,7 @@ function saveChatData($userId, $chatId, $message, $bearerToken, $statusUrl) {
 	$data = loadUserData($userId);
 
 	$titleStatusUrl = null;
+	$titleBearerToken = null;
 
 	if (!isset($data[$chatId])) {
 
@@ -151,7 +152,7 @@ function saveChatData($userId, $chatId, $message, $bearerToken, $statusUrl) {
 			'title'		=> prepareChatTitle(chatTitleFallback($message)),
 		];
 
-		$titleStatusUrl = chatTitleStatusUrl($message);
+		list($titleBearerToken, $titleStatusUrl) = chatTitleStatusUrl($message);
 	}
 
 	$data[$chatId]['updated']		= time();
@@ -163,10 +164,11 @@ function saveChatData($userId, $chatId, $message, $bearerToken, $statusUrl) {
 	}
 
 	return [
-		'user_id'			=> $userId,
-		'chat_id'			=> $chatId,
-		'title'				=> $data[$chatId]['title'],
-		'title_status_url'	=> $titleStatusUrl,
+		'user_id'				=> $userId,
+		'chat_id'				=> $chatId,
+		'title'					=> $data[$chatId]['title'],
+		'title_bearer_token'	=> $titleBearerToken,
+		'title_status_url'		=> $titleStatusUrl,
 	];
 }
 
@@ -238,7 +240,11 @@ function chatTitleStatusUrl($message) {
 		return null;
 	}
 
-	return $request['endpoints']['status_url'];
+	$bearerToken = empty($request['endpoints']['bearer_token'])
+		? null
+		: $request['endpoints']['bearer_token'];
+
+	return [$bearerToken, $request['endpoints']['status_url']];
 }
 
 
