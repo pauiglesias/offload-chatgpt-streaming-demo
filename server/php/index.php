@@ -11,23 +11,24 @@
 
 
 function streamRequest() {
-	$message		= empty($_POST['message'])			? null : $_POST['message'];
-	$fromStatusUrl 	= empty($_POST['from_status_url'])	? null : $_POST['from_status_url'];
-	$conversationId	= empty($_POST['conversation_id'])	? null : $_POST['conversation_id'];
-	streamRequestOutput($message, $fromStatusUrl, $conversationId);
+	$message			= empty($_POST['message'])				? null : $_POST['message'];
+	$fromStatusUrl 		= empty($_POST['from_status_url'])		? null : $_POST['from_status_url'];
+	$fromBearerToken	= empty($_POST['from_bearer_token'])	? null : $_POST['from_bearer_token'];
+	$conversationId	= empty($_POST['conversation_id'])			? null : $_POST['conversation_id'];
+	streamRequestOutput($message, $fromStatusUrl, $fromBearerToken, $conversationId);
 }
 
 
 
-function streamRequestOutput($message, $fromStatusUrl, $conversationId) {
+function streamRequestOutput($message, $fromStatusUrl, $fromBearerToken, $conversationId) {
 	header('Content-Type: application/json');
-	echo json_encode(streamRequestData($message, $fromStatusUrl, $conversationId), JSON_UNESCAPED_SLASHES);
+	echo json_encode(streamRequestData($message, $fromStatusUrl, $fromBearerToken, $conversationId), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
 
 
-function streamRequestData($message, $fromStatusUrl, $conversationId) {
+function streamRequestData($message, $fromStatusUrl, $fromBearerToken, $conversationId) {
 
 	if (empty($message)) {
 		return null;
@@ -45,6 +46,10 @@ function streamRequestData($message, $fromStatusUrl, $conversationId) {
 
 	if (!empty($fromStatusUrl)) {
 		$args['from_status_url'] = $fromStatusUrl;
+	}
+
+	if (!empty($fromBearerToken)) {
+		$args['from_bearer_token'] = $fromBearerToken;
 	}
 
 	if (!empty($conversationId)) {

@@ -103,10 +103,11 @@ $(function() {
 		const watermarkId = watermark($content);
 
 		const data = {
-			action			: 'stream',
-			message			: message,
-			from_status_url	: $content.attr('data-status-url') || '',
-			conversation_id	: $content.attr('data-conversation-id') || ''
+			action				: 'stream',
+			message				: message,
+			from_status_url		: $content.attr('data-status-url') || '',
+			from_bearer_token	: $content.attr('data-bearer-token') || '',
+			conversation_id		: $content.attr('data-conversation-id') || ''
 		};
 
 		const $input = $content.find('.chat-input-text textarea');
