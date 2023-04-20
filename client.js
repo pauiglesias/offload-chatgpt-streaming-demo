@@ -153,8 +153,8 @@ $(function() {
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			saveChat($content, conversationId, bearerToken, statusUrl, message, !data.conversation_id);
-			streamMessages($content, $div, $input, streamToken, e.endpoints.stream_events_url);
+			saveChat($content, conversationId, statusUrl, bearerToken, message, !data.conversation_id);
+			streamMessages($content, $div, $input, e.endpoints.stream_events_url, streamToken);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -167,7 +167,7 @@ $(function() {
 
 
 
-	function streamMessages($content, $div, $input, streamToken, url) {
+	function streamMessages($content, $div, $input, url, streamToken) {
 
 		let html = '';
 		const watermarkId = watermark($content);
@@ -536,15 +536,15 @@ $(function() {
 
 
 
-	function saveChat($content, chatId, bearerToken, statusUrl, message, newChat) {
+	function saveChat($content, chatId, statusUrl, bearerToken, message, newChat) {
 
 		const data = {
 			action			: 'save',
 			user_id			: userId,
 			chat_id			: chatId,
 			message			: message,
-			bearer_token	: bearerToken,
 			status_url		: statusUrl,
+			bearer_token	: bearerToken
 		};
 
 		$.post(chatConfig.serverUrl, data, function(e) {
@@ -554,7 +554,7 @@ $(function() {
 			}
 
 			if (e.title_status_url) {
-				waitForChatTitleUrl($content, data.chat_id, data.status_url, e.title_bearer_token, e.title_status_url, e.title);
+				waitForChatTitleUrl($content, data.chat_id, data.status_url, e.title_status_url, e.title_bearer_token, e.title);
 				return;
 			}
 
@@ -611,13 +611,13 @@ $(function() {
 
 
 
-	function waitForChatTitleUrl($content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback) {
-		setTimeout(fetchTitleUrl, 500, $content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback);
+	function waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl, titleBearerToken, titleFallback) {
+		setTimeout(fetchTitleUrl, 500, $content, chatId, statusUrl, titleStatusUrl, titleBearerToken, titleFallback);
 	}
 
 
 
-	function fetchTitleUrl($content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback) {
+	function fetchTitleUrl($content, chatId, statusUrl, titleStatusUrl, titleBearerToken, titleFallback) {
 
 		$.ajax({
 			url: titleStatusUrl,
@@ -635,7 +635,7 @@ $(function() {
 			}
 
 			if ('done' != e.status) {
-				waitForChatTitleUrl($content, chatId, statusUrl, titleBearerToken, titleStatusUrl, titleFallback);
+				waitForChatTitleUrl($content, chatId, statusUrl, titleStatusUrl, titleBearerToken, titleFallback);
 				return;
 			}
 
