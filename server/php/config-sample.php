@@ -22,7 +22,7 @@ define('OFFLOAD_CHATGPT_API_KEY', '[YOUR_API_KEY]');
 
 
 /**
- * Privacy settings on Status Urls
+ * Privacy settings on Endpoints Urls
  * Allowed values: `public` or `private`
  */
 define('OFFLOAD_ACCESS', 'public');
