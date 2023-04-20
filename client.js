@@ -623,7 +623,9 @@ $(function() {
 	function fetchTitleUrl($content, chatId, statusUrl, titleStatusUrl, titleBearerToken, titleFallback) {
 
 		$.ajax({
+
 			url: titleStatusUrl,
+
 			beforeSend: function(xhr) {
 				if (titleBearerToken) {
 					xhr.setRequestHeader('Authorization', 'Bearer ' + titleBearerToken);
@@ -669,14 +671,28 @@ $(function() {
 			return;
 		}
 
-		$.get(stopUrl, function(e) {
+		const watermarkId = watermark($content);
+		const bearerToken = $content.attr('data-bearer-token') || '';
+
+		$.ajax({
+
+			url: stopUrl,
+
+			beforeSend: function(xhr) {
+				if (bearerToken) {
+					xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken);
+				}
+			}
+
+		}).done(function(e) {
+
+			if (!watermark($content, watermarkId)) {
+				return;
+			}
 
 			if (!e || !e.status || 'success' !== e.status) {
 				return;
 			}
-
-			$content.attr('data-from-status-url', $content.attr('data-from-status-url-prev') || '');
-			$content.attr('data-status-url', $content.attr('data-from-status-url'));
 
 			setStreaming($content, false);
 			lastMessageItem($content).attr('data-stopped', true);
