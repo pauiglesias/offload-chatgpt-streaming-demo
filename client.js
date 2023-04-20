@@ -148,12 +148,13 @@ $(function() {
 			const bearerToken = e.endpoints.bearer_token || '';
 			const streamToken = e.endpoints.stream_token || '';
 			$content.attr('data-bearer-token', bearerToken);
+			$content.attr('data-from-bearer-token', data.from_bearer_token);
 
 			$inputDiv && $inputDiv.removeClass('chat-messages-input-wait');
 			const $div = addMessage($content, squareCursor(true), 'output');
 			scrollBottom($content);
 
-			saveChat($content, conversationId, statusUrl, bearerToken, message, !data.conversation_id);
+			saveChat($content, conversationId, statusUrl, bearerToken, data.from_bearer_token, message, !data.conversation_id);
 			streamMessages($content, $div, $input, e.endpoints.stream_events_url, streamToken);
 
 		}).fail(function(e) {
@@ -304,6 +305,7 @@ $(function() {
 		unreadyInputButton($content.find('.chat-input-text textarea'), true);
 
 		$content.attr('data-status-url', $content.attr('data-from-status-url'));
+		$content.attr('data-bearer-token', $content.attr('data-from-bearer-token'));
 
 		autoscroll = true;
 		scrollBottom($content);
@@ -536,15 +538,16 @@ $(function() {
 
 
 
-	function saveChat($content, chatId, statusUrl, bearerToken, message, newChat) {
+	function saveChat($content, chatId, statusUrl, bearerToken, fromBearerToken, message, newChat) {
 
 		const data = {
-			action			: 'save',
-			user_id			: userId,
-			chat_id			: chatId,
-			message			: message,
-			status_url		: statusUrl,
-			bearer_token	: bearerToken
+			action				: 'save',
+			user_id				: userId,
+			chat_id				: chatId,
+			message				: message,
+			status_url			: statusUrl,
+			bearer_token		: bearerToken,
+			from_bearer_token	: fromBearerToken
 		};
 
 		$.post(chatConfig.serverUrl, data, function(e) {
@@ -795,7 +798,7 @@ $(function() {
 				return;
 			}
 
-			loadChatJson($content, chatId, e.bearer_token, e.status_url);
+			loadChatJson($content, chatId, e.status_url, e.bearer_token, e.from_bearer_token);
 
 		}).fail(function() {
 			$content.removeClass('chat-content-loading');
@@ -805,13 +808,13 @@ $(function() {
 
 
 
-	function loadChatJson($content, chatId, bearerToken, statusUrl) {
+	function loadChatJson($content, chatId, statusUrl, bearerToken, fromBearerToken) {
 
 		const watermarkId = watermark($content);
 
 		$content.attr('data-conversation-id', chatId);
 		$content.attr('data-status-url', statusUrl);
-		$content.attr('data-bearer-token', bearerToken);
+		$content.attr('data-bearer-token', bearerToken || '');
 		$content.removeAttr('data-stop-url');
 
 		$.ajax({
@@ -828,7 +831,7 @@ $(function() {
 				return;
 			}
 
-			onLoadChatJson(e, $content, chatId);
+			onLoadChatJson(e, $content, chatId, fromBearerToken);
 
 		}).always(function() {
 
@@ -843,7 +846,7 @@ $(function() {
 
 
 
-	function onLoadChatJson(e, $content, chatId) {
+	function onLoadChatJson(e, $content, chatId, fromBearerToken) {
 
 		if (!e || !e.status) {
 			return;
@@ -855,7 +858,9 @@ $(function() {
 			return;
 		}
 
-		$content.attr('data-from-status-url', e.endpoints && e.endpoints.from_status_url ? e.endpoints.from_status_url : '');
+		const fromStatusUrl = e.endpoints && e.endpoints.from_status_url ? e.endpoints.from_status_url : '';
+		$content.attr('data-from-status-url', fromStatusUrl);
+		$content.attr('data-from-bearer-token', fromStatusUrl ? fromBearerToken : '');
 
 		$content.closest('.chat').find('.chat-sidebar .chat-sidebar-list .chat-sidebar-item[data-chat-id="' + chatId + '"]').removeClass('chat-sidebar-loading').addClass('chat-sidebar-selected');
 

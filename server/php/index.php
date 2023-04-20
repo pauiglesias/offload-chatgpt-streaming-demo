@@ -117,25 +117,26 @@ function remoteRequestOptionsArgs($args = []) {
 
 
 function saveChat() {
-	$userId 		= empty($_POST['user_id'])		? null : $_POST['user_id'];
-	$chatId 		= empty($_POST['chat_id'])		? null : $_POST['chat_id'];
-	$message		= empty($_POST['message'])		? null : $_POST['message'];
-	$statusUrl 		= empty($_POST['status_url'])	? null : $_POST['status_url'];
-	$bearerToken	= empty($_POST['bearer_token'])	? null : $_POST['bearer_token'];
-	saveChatResponse($userId, $chatId, $message, $statusUrl, $bearerToken);
+	$userId 			= empty($_POST['user_id'])				? null : $_POST['user_id'];
+	$chatId 			= empty($_POST['chat_id'])				? null : $_POST['chat_id'];
+	$message			= empty($_POST['message'])				? null : $_POST['message'];
+	$statusUrl 			= empty($_POST['status_url'])			? null : $_POST['status_url'];
+	$bearerToken		= empty($_POST['bearer_token'])			? null : $_POST['bearer_token'];
+	$fromBearerToken	= empty($_POST['from_bearer_token'])	? null : $_POST['from_bearer_token'];
+	saveChatResponse($userId, $chatId, $message, $statusUrl, $bearerToken, $fromBearerToken);
 }
 
 
 
-function saveChatResponse($userId, $chatId, $message, $statusUrl, $bearerToken) {
+function saveChatResponse($userId, $chatId, $message, $statusUrl, $bearerToken, $fromBearerToken) {
 	header('Content-Type: application/json');
-	echo json_encode(saveChatData($userId, $chatId, $message, $statusUrl, $bearerToken), JSON_UNESCAPED_SLASHES);
+	echo json_encode(saveChatData($userId, $chatId, $message, $statusUrl, $bearerToken, $fromBearerToken), JSON_UNESCAPED_SLASHES);
 	die;
 }
 
 
 
-function saveChatData($userId, $chatId, $message, $statusUrl, $bearerToken) {
+function saveChatData($userId, $chatId, $message, $statusUrl, $bearerToken, $fromBearerToken) {
 
 	if (empty($userId) ||
 		empty($chatId) ||
@@ -160,9 +161,10 @@ function saveChatData($userId, $chatId, $message, $statusUrl, $bearerToken) {
 		list($titleStatusUrl, $titleBearerToken) = chatTitleStatusUrl($message);
 	}
 
-	$data[$chatId]['updated']		= time();
-	$data[$chatId]['status_url']	= $statusUrl;
-	$data[$chatId]['bearer_token']	= $bearerToken;
+	$data[$chatId]['updated']			= time();
+	$data[$chatId]['status_url']		= $statusUrl;
+	$data[$chatId]['bearer_token']		= $bearerToken;
+	$data[$chatId]['from_bearer_token']	= $fromBearerToken;
 
 	if (!saveUserData($userId, $data)) {
 		return null;
@@ -375,11 +377,12 @@ function chatResponseData($userId, $chatId) {
 	}
 
 	return [
-		'user_id'		=> $userId,
-		'chat_id'		=> $chatId,
-		'title'			=> $data[$chatId]['title'],
-		'status_url' 	=> $data[$chatId]['status_url'],
-		'bearer_token'	=> $data[$chatId]['bearer_token'],
+		'user_id'			=> $userId,
+		'chat_id'			=> $chatId,
+		'title'				=> $data[$chatId]['title'],
+		'status_url' 		=> $data[$chatId]['status_url'],
+		'bearer_token'		=> $data[$chatId]['bearer_token'],
+		'from_bearer_token'	=> $data[$chatId]['from_bearer_token'],
 	];
 }
 
