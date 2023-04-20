@@ -900,7 +900,7 @@ $(function() {
 			}
 		}
 
-		if (['done', 'stop', 'stream'].includes(e.status) &&
+		if (['done', 'stop', 'streaming'].includes(e.status) &&
 			e.response &&
 			e.response.body &&
 			e.response.body.choices &&
