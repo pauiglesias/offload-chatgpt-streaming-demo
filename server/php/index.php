@@ -428,7 +428,6 @@ function chatsDataItems($data) {
 		$items[] = [
 			'chat_id'		=> $chatId,
 			'title'			=> $title,
-			'status_url'	=> $info['status_url']
 		];
 	}
 
