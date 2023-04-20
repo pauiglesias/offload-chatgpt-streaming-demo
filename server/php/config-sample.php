@@ -18,3 +18,11 @@ define('OPENAI_API_KEY', '[YOUR_API_KEY]');
  * https://rapidapi.com/microdeploy/api/offload-chatgpt
  */
 define('OFFLOAD_CHATGPT_API_KEY', '[YOUR_API_KEY]');
+
+
+
+/**
+ * Privacy settings on Status Urls
+ * Allowed values: `public` or `private`
+ */
+define('OFFLOAD_ACCESS', 'public');

@@ -39,6 +39,10 @@ function streamRequestData($message, $fromStatusUrl, $conversationId) {
 		], JSON_UNESCAPED_SLASHES),
 	];
 
+	if (defined('OFFLOAD_ACCESS')) {
+		$args['access'] = OFFLOAD_ACCESS;
+	}
+
 	if (!empty($fromStatusUrl)) {
 		$args['from_status_url'] = $fromStatusUrl;
 	}
@@ -244,6 +248,10 @@ function chatTitleRequest($message) {
 			['role' => 'system', 'content' => 'Summarize the following user text in 3 to 5 words in the same language: "'.str_replace('"', '', $message).'"'],
 		]),
 	];
+
+	if (defined('OFFLOAD_ACCESS')) {
+		$args['access'] = OFFLOAD_ACCESS;
+	}
 
 	return remoteRequest($args, '/async-chatgpt');
 }
