@@ -39,8 +39,8 @@ function streamRequestData($message, $fromStatusUrl, $conversationId) {
 		], JSON_UNESCAPED_SLASHES),
 	];
 
-	if (defined('OFFLOAD_ACCESS')) {
-		$args['access'] = OFFLOAD_ACCESS;
+	if (defined('OFFLOAD_CHATGPT_ACCESS')) {
+		$args['access'] = OFFLOAD_CHATGPT_ACCESS;
 	}
 
 	if (!empty($fromStatusUrl)) {
@@ -257,8 +257,8 @@ function chatTitleRequest($message) {
 		]),
 	];
 
-	if (defined('OFFLOAD_ACCESS')) {
-		$args['access'] = OFFLOAD_ACCESS;
+	if (defined('OFFLOAD_CHATGPT_ACCESS')) {
+		$args['access'] = OFFLOAD_CHATGPT_ACCESS;
 	}
 
 	return remoteRequest($args, '/async-chatgpt');
