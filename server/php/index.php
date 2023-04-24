@@ -90,7 +90,7 @@ function remoteRequest($args, $endpoint) {
 function remoteRequestOptions($args, $endpoint) {
 
 	$options = [
-		CURLOPT_URL				=> 'https://api.offloadgpt.com/v1'.$endpoint,
+		CURLOPT_URL				=> OFFLOAD_GPT_BASE_URL.$endpoint,
 		CURLOPT_RETURNTRANSFER	=> true,
 		CURLOPT_MAXREDIRS		=> 3,
 		CURLOPT_TIMEOUT			=> 60,
