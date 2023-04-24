@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Offload ChatGPT Streaming Demo
- * Copy or rename this file to config.php and complete the following constants to start the demo.
+ * OffloadGPT Streaming Demo
+ * Copy or rename this file to `config.php` and complete the following constants to start the demo.
  */
 
 
@@ -10,14 +10,23 @@
  * Your OpenAI API Key
  * https://platform.openai.com/
  */
-define('OPENAI_API_KEY', '[YOUR_API_KEY]');
+define('OPENAI_API_KEY', '[YOUR_OPENAI_API_KEY]');
+
 
 
 /**
- * Your RapidAPI Api Key for Offload ChatGPT
- * https://rapidapi.com/microdeploy/api/offload-chatgpt
+ * Your OpenAI Organization
+ * Optional
  */
-define('OFFLOAD_CHATGPT_API_KEY', '[YOUR_API_KEY]');
+//define('OPENAI_ORGANIZATION', '[YOUR_OPENAI_ORGANIZATION]');
+
+
+
+/**
+ * Your RapidAPI Api Key for OffloadGPT
+ * https://rapidapi.com/microdeploy/api/offloadgpt
+ */
+define('OFFLOAD_GPT_API_KEY', '[YOUR_API_KEY]');
 
 
 
@@ -25,4 +34,4 @@ define('OFFLOAD_CHATGPT_API_KEY', '[YOUR_API_KEY]');
  * Privacy settings on Endpoints Urls
  * Allowed values: `public` or `private`
  */
-define('OFFLOAD_CHATGPT_ACCESS', 'public');
+define('OFFLOAD_GPT_ACCESS', 'public');

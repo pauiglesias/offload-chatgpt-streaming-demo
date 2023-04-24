@@ -40,8 +40,8 @@ function streamRequestData($message, $fromStatusUrl, $fromBearerToken, $conversa
 		], JSON_UNESCAPED_SLASHES),
 	];
 
-	if (defined('OFFLOAD_CHATGPT_ACCESS')) {
-		$args['access'] = OFFLOAD_CHATGPT_ACCESS;
+	if (defined('OFFLOAD_GPT_ACCESS')) {
+		$args['access'] = OFFLOAD_GPT_ACCESS;
 	}
 
 	if (!empty($fromStatusUrl)) {
@@ -88,7 +88,8 @@ function remoteRequest($args, $endpoint) {
 
 
 function remoteRequestOptions($args, $endpoint) {
-	return [
+
+	$options = [
 		CURLOPT_URL				=> 'https://api.offloadgpt.com/v1'.$endpoint,
 		CURLOPT_RETURNTRANSFER	=> true,
 		CURLOPT_MAXREDIRS		=> 3,
@@ -96,16 +97,19 @@ function remoteRequestOptions($args, $endpoint) {
 		CURLOPT_FOLLOWLOCATION	=> true,
 		CURLOPT_HTTP_VERSION	=> CURL_HTTP_VERSION_1_1,
 		CURLOPT_CUSTOMREQUEST	=> 'POST',
-		CURLOPT_POSTFIELDS		=> http_build_query(remoteRequestOptionsArgs($args)),
+		CURLOPT_HTTPHEADER		=> [
+			'Content-Type: application/json',
+			'X-OpenAI-API-Key: '.OPENAI_API_KEY,
+		],
+		CURLOPT_POSTFIELDS		=> http_build_query($args),
 	];
-}
 
+	$organization = defined('OPENAI_ORGANIZATION') ? OPENAI_ORGANIZATION : '';
+	if (!empty($organization)) {
+		$options[CURLOPT_HTTPHEADER][] = OPENAI_ORGANIZATION;
+	}
 
-
-function remoteRequestOptionsArgs($args = []) {
-	return array_merge($args, [
-		'api_key' => OPENAI_API_KEY,
-	]);
+	return $options;
 }
 
 
@@ -267,8 +271,8 @@ function chatTitleRequest($message) {
 		]),
 	];
 
-	if (defined('OFFLOAD_CHATGPT_ACCESS')) {
-		$args['access'] = OFFLOAD_CHATGPT_ACCESS;
+	if (defined('OFFLOAD_GPT_ACCESS')) {
+		$args['access'] = OFFLOAD_GPT_ACCESS;
 	}
 
 	return remoteRequest($args, '/async-chatgpt');
