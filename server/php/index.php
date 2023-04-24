@@ -106,7 +106,7 @@ function remoteRequestOptions($args, $endpoint) {
 
 	$organization = defined('OPENAI_ORGANIZATION') ? OPENAI_ORGANIZATION : '';
 	if (!empty($organization)) {
-		$options[CURLOPT_HTTPHEADER][] = OPENAI_ORGANIZATION;
+		$options[CURLOPT_HTTPHEADER][] = $organization;
 	}
 
 	return $options;
