@@ -8,7 +8,7 @@ OffloadGPT Streaming Demo
 - Copy or rename the config-sample.php file to config.php
 - Fill the constants with your API Keys
 
-https://rapidapi.com/microdeploy/api/offload-chatgpt
+https://rapidapi.com/microdeploy/api/offloadgpt
 
 # Start with PHP server
 
