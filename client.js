@@ -143,8 +143,8 @@ $(function() {
 			$content.attr('data-stop-url', e.endpoints.stop_url ? e.endpoints.stop_url : '');
 			$content.attr('data-from-status-url', data.from_status_url);
 
-			const bearerToken = e.endpoints.bearer_token || '';
-			const streamToken = e.endpoints.stream_token || '';
+			const bearerToken = e.authorization && e.authorization.bearer_token || '';
+			const streamUrlArg = e.authorization && e.authorization.stream_url_arg || '';
 			$content.attr('data-bearer-token', bearerToken);
 			$content.attr('data-from-bearer-token', data.from_bearer_token);
 
@@ -153,7 +153,7 @@ $(function() {
 			scrollBottom($content);
 
 			saveChat($content, conversationId, statusUrl, bearerToken, data.from_bearer_token, message, !data.conversation_id);
-			streamMessages($content, $div, $input, e.endpoints.stream_events_url, streamToken);
+			streamMessages($content, $div, $input, e.endpoints.stream_events_url, streamUrlArg);
 
 		}).fail(function(e) {
 			console.log(e);
@@ -166,12 +166,12 @@ $(function() {
 
 
 
-	function streamMessages($content, $div, $input, url, streamToken) {
+	function streamMessages($content, $div, $input, url, streamUrlArg) {
 
 		let html = '';
 		const watermarkId = watermark($content);
 
-		const eventSource = new EventSource(url + (streamToken ? '?stream_token=' + streamToken : ''));
+		const eventSource = new EventSource(url + (streamUrlArg ? '?' + streamUrlArg : ''));
 
 		eventSource.onmessage = function(e) {
 
