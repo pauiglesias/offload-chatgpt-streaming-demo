@@ -1,0 +1,16 @@
+config.php
+data.json
+/node_modules
+/vendor
+.env
+.env.bk
+.env.bk.00
+.env.backup
+.env_old
+.env_0
+.env.0
+.env_00
+.env.00
+/.idea
+/.vscode
+/data
