@@ -23,17 +23,18 @@ define('OPENAI_API_KEY', '[YOUR_OPENAI_API_KEY]');
 
 
 /**
- * The OffloadGPT Base URL
+ * Your RapidAPI Api Key for OffloadGPT
+ * https://rapidapi.com/microdeploy/api/offloadgpt
  */
-define('OFFLOAD_GPT_BASE_URL', 'https://api.offloadgpt.com/v1');
+define('OFFLOAD_GPT_RAPIDAPI_KEY',  '[YOUR_RAPIDAPI_KEY]');
+define('OFFLOAD_GPT_RAPIDAPI_HOST', '[YOUR_RAPIDAPI_HOST]');
 
 
 
 /**
- * Your RapidAPI Api Key for OffloadGPT
- * https://rapidapi.com/microdeploy/api/offloadgpt
+ * The OffloadGPT Base URL
  */
-define('OFFLOAD_GPT_API_KEY', '[YOUR_API_KEY]');
+define('OFFLOAD_GPT_BASE_URL', 'https://offloadgpt.p.rapidapi.com/v1');
 
 
 

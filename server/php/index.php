@@ -92,6 +92,8 @@ function remoteRequestOptions($args, $endpoint) {
 	$headers =[
 		'Content-Type: application/json',
 		'X-OpenAI-API-Key: '.OPENAI_API_KEY,
+		'X-RapidAPI-Key: '.OFFLOAD_GPT_RAPIDAPI_KEY,
+		'X-RapidAPI-Host: '.OFFLOAD_GPT_RAPIDAPI_HOST,
 	];
 
 	$organization = defined('OPENAI_ORGANIZATION') ? OPENAI_ORGANIZATION : '';
