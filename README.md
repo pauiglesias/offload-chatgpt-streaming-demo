@@ -1,7 +1,7 @@
 
-# offload-chatgpt-streaming-demo
+# offload-gpt-streaming-demo
 
-Offload ChatGPT Streaming Demo
+OffloadGPT Streaming Demo
 
 ## Instructions
 
