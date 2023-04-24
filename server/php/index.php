@@ -89,27 +89,27 @@ function remoteRequest($args, $endpoint) {
 
 function remoteRequestOptions($args, $endpoint) {
 
-	$options = [
+	$headers =[
+		'Content-Type: application/json',
+		'X-OpenAI-API-Key: '.OPENAI_API_KEY,
+	];
+
+	$organization = defined('OPENAI_ORGANIZATION') ? OPENAI_ORGANIZATION : '';
+	if (!empty($organization)) {
+		$headers[] = $organization;
+	}
+
+	return [
 		CURLOPT_URL				=> OFFLOAD_GPT_BASE_URL.$endpoint,
 		CURLOPT_RETURNTRANSFER	=> true,
 		CURLOPT_MAXREDIRS		=> 3,
 		CURLOPT_TIMEOUT			=> 60,
 		CURLOPT_FOLLOWLOCATION	=> true,
 		CURLOPT_HTTP_VERSION	=> CURL_HTTP_VERSION_1_1,
+		CURLOPT_HTTPHEADER		=> $headers,
 		CURLOPT_CUSTOMREQUEST	=> 'POST',
-		CURLOPT_HTTPHEADER		=> [
-			'Content-Type: application/json',
-			'X-OpenAI-API-Key: '.OPENAI_API_KEY,
-		],
-		CURLOPT_POSTFIELDS		=> http_build_query($args),
+		CURLOPT_POSTFIELDS		=> @json_encode($args, JSON_UNESCAPED_SLASHES),
 	];
-
-	$organization = defined('OPENAI_ORGANIZATION') ? OPENAI_ORGANIZATION : '';
-	if (!empty($organization)) {
-		$options[CURLOPT_HTTPHEADER][] = $organization;
-	}
-
-	return $options;
 }
 
 
