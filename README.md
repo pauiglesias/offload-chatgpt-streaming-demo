@@ -32,9 +32,9 @@ You can execute this demo using [Docker](https://www.docker.com), so you need to
 
 Alternatively, if you have installed PHP with cUrl support, you can run the standalone PHP Server.
 
-Another option is execute it through a web server with PHP and PHP-cUrl support, like Apache or NGINX with php-fpm.
+Another option is using a web server with PHP (and PHP-CURL) support, like Apache or NGINX with php-fpm.
 
-Future plans will include server execution in the cloud using Edge scripts services, so you do not need to install anything in your local machine.
+Future plans will include server execution in the cloud via edge scripts services, so you do not need to install anything in your local machine.
 
 ## Configuration
 
@@ -44,7 +44,7 @@ In order to configure the applications, you need to follow the following steps:
 
 - Copy or rename the `config-sample.php file to` config.php ` in the same `server/php` directory.
 - Fill the constants with your OpenAI API Key, and the RAPIDAPI Keys.
-- Specify URLs access with `public` or `private` to set the responses privacy.
+- Specify access with `public` or `private` to set the URLs privacy.
 
 ## Execution
 
