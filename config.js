@@ -1,3 +1,3 @@
 const chatConfig = {
-	serverUrl: './server/php'
+	serverUrl: './server/scripts/php'
 };
