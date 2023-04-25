@@ -73,12 +73,18 @@ docker build -t offloadgpt .
 Once you have created it, you can start the service in this way, sharing the `/server` directory for data and config files persistence:
 
 ```shell
-docker run --name=offloadgpt -d -v ~/server:/home/php/app/server -p 8000:8000 offloadgpt
+docker run --name=offloadgpt -d -v ./server:/server -p 8000:8000 offloadgpt
 ```
 
 And run it in the browser from this address:
 
 [http://localhost:8000](http://localhost:8000)
+
+In order to stop and remove the running container, execute this command:
+
+```shell
+docker container stop offloadgpt && docker container rm offloadgpt
+```
 
 ### Or start with PHP server
 
