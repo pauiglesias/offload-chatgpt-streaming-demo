@@ -1,5 +1,3 @@
-config.php
-data.json
 /node_modules
 /vendor
 .env
@@ -13,4 +11,5 @@ data.json
 .env.00
 /.idea
 /.vscode
-/data
+/server/data
+/server/scripts/php/config.php
