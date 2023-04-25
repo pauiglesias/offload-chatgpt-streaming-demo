@@ -28,15 +28,15 @@ A free plan with 50 calls per day is available.
 
 ### Docker installed on your machine, or PHP with cUrl support, or using a Web server
 
-You can execute this demo using Docker, so you need to have it installed on your machine.
+You can execute this demo using [Docker](https://www.docker.com), so you need to have it installed on your machine.
 
-Alternatively, if you have installed PHP, you can run the standalone PHP Server.
+Alternatively, if you have installed PHP with cUrl support, you can run the standalone PHP Server.
 
-Another option is execute it through a web server with PHP support, like Apache or NGINX with php-fpm.
+Another option is execute it through a web server with PHP and PHP-cUrl support, like Apache or NGINX with php-fpm.
 
-Future plans will include server execution in the cloud using Edge services, so you do not need to install anything in your local machine.
+Future plans will include server execution in the cloud using Edge scripts services, so you do not need to install anything in your local machine.
 
-## Congiguration
+## Configuration
 
 Currently only server's side PHP execution is supported.
 
@@ -52,4 +52,12 @@ In order to configure the applications, you need to follow the following steps:
 
 ### Start with PHP server
 
+A standalone PHP is provided with PHP, so you can run this project from command line typing this command:
+
 php -S 127.0.01:8000 -t .
+
+## Data management
+
+This project only stores the location of the generated URLs by OffloadGPT and the minimum related data, like the title of the conversation or a Bearer Token if the status Url is private.
+
+The data is located at the `data` directory from the root of this project, and it consists of a JSON file where is stored the conversations list.
