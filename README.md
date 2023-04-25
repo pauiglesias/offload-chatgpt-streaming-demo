@@ -1,6 +1,8 @@
 
 # OffloadGPT Streaming Demo - ChatGPT clone
 
+![OffloadGPT Streaming Demo - ChatGPT clone](https://github.com/pauiglesias/offload-chatgpt-streaming-demo/blob/main/images/demo.png?raw=true)
+
 A ChatGPT clone that allows users to [chat with OpenAI](https://platform.openai.com/docs/guides/chat) language models.
 
 It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offloadgpt), a service that enables ChatGPT API deferred responses:
