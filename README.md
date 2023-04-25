@@ -10,6 +10,19 @@ It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offlo
 - Offload your server's workload to external resources.
 - Easily concatenates messages from previous responses.
 
+Table of Contents:
+
+- [Prerequisites](#prerequisites)
+	- [Your OpenAI API key](#your-openai-api-key)
+	- [A RapidApi account](#a-rapidapi-account)
+	- [Docker installed on your machine, or PHP with cUrl support, or using a Web Server](#docker-installed-on-your-machine-or-php-with-curl-support-or-using-a-web-server)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Execution](#execution)
+	- [Start with Docker](#start-with-docker)
+	- [Or start with the built-in PHP server](#or-start-with-the-built-in-php-server)
+- [Data management](#data-management)
+
 ## Prerequisites
 
 ### Your OpenAI API key
