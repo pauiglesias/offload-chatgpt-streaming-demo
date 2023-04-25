@@ -16,7 +16,7 @@ It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offlo
 
 Your [OpenAI API Key](https://platform.openai.com/account/api-keys) is used only in the OpenAI API call and will never be saved, shared or published.
 
-The OpenAI API Key is deleted in memory after the OpenAI API request is performed.
+The OpenAI API Key is deleted in memory after the OpenAI API request is performed, avoiding to show it in logs or debug output.
 
 ### A RapidApi account
 
