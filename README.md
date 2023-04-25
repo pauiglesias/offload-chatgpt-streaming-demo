@@ -1,7 +1,7 @@
 
 # OffloadGPT Streaming Demo
 
-A ChatGPT clone that allows users to chat with OpenAI language models.
+A ChatGPT clone that allows users to [chat with OpenAI](https://platform.openai.com/docs/guides/chat) language models.
 
 It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offloadgpt), a service that enables ChatGPT API deferred responses:
 
@@ -14,28 +14,37 @@ It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offlo
 
 ### Your OpenAI API key
 
-Your OpenAI API Key is used only in the OpenAI API call and will never be saved, shared or published.
+Your [OpenAI API Key](https://platform.openai.com/account/api-keys) is used only in the OpenAI API call and will never be saved, shared or published.
 
 The OpenAI API Key is deleted in memory after the OpenAI API request is performed.
 
 ### A RapidApi account
 
-The OffloadGPT API is hosted on RapidAPI, so you need to create a personal account.
+The OffloadGPT API is hosted on [RapidAPI](https://rapidapi.com), so you need to create a personal account.
 
 Then you can subscribe to any of the [Offload GPT plans](https://rapidapi.com/microdeploy/api/offloadgpt/pricing) to run the service.
 
 A free plan with 50 calls per day is available.
 
-### Docker installed on your machine
+### Docker installed on your machine, or PHP with cUrl support, or using a Web server
 
-### Alternatively, PHP installed in your machine with Curl
+You can execute this demo using Docker, so you need to have it installed on your machine.
 
-## Instructions
+Alternatively, if you have installed PHP, you can run the standalone PHP Server.
 
-- Copy or rename the config-sample.php file to config.php
-- Fill the constants with your API Keys
+Another option is execute it through a web server with PHP support, like Apache or NGINX with php-fpm.
 
-https://rapidapi.com/microdeploy/api/offloadgpt
+Future plans will include server execution in the cloud using Edge services, so you do not need to install anything in your local machine.
+
+## Congiguration
+
+Currently only server's side PHP execution is supported.
+
+In order to configure the applications, you need to follow the following steps:
+
+- Copy or rename the `config-sample.php file to` config.php ` in the same `server/php` directory.
+- Fill the constants with your OpenAI API Key, and the RAPIDAPI Keys.
+- Specify URLs access with `public` or `private` to set the responses privacy.
 
 ## Execution
 
