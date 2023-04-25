@@ -54,11 +54,11 @@ cd offload-chatgpt-streaming-demo
 
 Currently only server's side PHP execution is supported.
 
-In order to configure the applications, you need to follow the following steps:
+From the `server/scripts/php` directory:
 
-- Copy or rename the `config-sample.php` file to `config.php` from the `server/scripts/php` directory.
-- Fill the constants with your OpenAI API Key, and the RAPIDAPI Keys.
-- Specify `public` or `private` access to set the URLs privacy.
+- Copy or rename the `config-sample.php` file to `config.php`
+- Fill the constants with your **OpenAI API Key**, and the **RAPIDAPI Keys**
+- Specify `public` or `private` access constant to define the URLs privacy.
 
 ## Execution
 
