@@ -48,13 +48,15 @@ In order to configure the applications, you need to follow the following steps:
 
 ## Execution
 
-### Start with docker
+### Start with Docker
+
+
 
 ### Start with PHP server
 
 If you have PHP installed in your machine, a standalone PHP is provided with PHP, so you can run this project from command line typing this command:
 
-php -S 127.0.01:8000 -t .
+php -S 127.0.0.1:8000 -t .
 
 And then open this address in your browser:
 
