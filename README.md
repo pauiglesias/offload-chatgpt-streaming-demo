@@ -115,6 +115,6 @@ This project only stores the location of the generated URLs by OffloadGPT and th
 
 The data is located in the `server/data` directory at the root of this project, and it consists of a JSON file per user where the conversations list is stored
 
-The filename is composed of a randomly generated string of 16 characters, generated at the client-side.
+The filename is composed of a randomly generated string of 16 characters, created from the client-side script.
 
 Using single JSON files in this manner is only intended for demonstration purposes and is not recommended for live production servers.
