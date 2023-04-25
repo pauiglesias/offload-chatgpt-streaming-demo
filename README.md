@@ -50,7 +50,17 @@ In order to configure the applications, you need to follow the following steps:
 
 ### Start with Docker
 
+If it is the first time, you need to create the initial Docker image:
 
+    docker build -t offloadgpt .
+
+Once you have created it, you can start the service in this way, sharing the `/server` directory for data and config files persistence:
+
+    docker run --name=offloadgpt -v ~/server:/home/php/app/server -p 8000:8000 offloadgpt
+
+And run it in the browser from this address:
+
+[http://localhost:8000](http://localhost:8000)
 
 ### Start with PHP server
 
@@ -60,7 +70,7 @@ php -S 127.0.0.1:8000 -t .
 
 And then open this address in your browser:
 
-[http://127.0.0.1:8000](http://127.0.0.1:8000)
+[http://localhost:8000](http://localhost:8000)
 
 ## Data management
 
