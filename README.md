@@ -1,5 +1,5 @@
 
-# OffloadGPT Streaming Demo
+# OffloadGPT Streaming Demo - ChatGPT clone
 
 A ChatGPT clone that allows users to [chat with OpenAI](https://platform.openai.com/docs/guides/chat) language models.
 
