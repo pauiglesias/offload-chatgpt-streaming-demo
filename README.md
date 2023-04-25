@@ -10,7 +10,7 @@ It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offlo
 - Offload your server's workload to external resources.
 - Easily concatenates messages from previous responses.
 
-Table of Contents:
+**Table of Contents:**
 
 - [Prerequisites](#prerequisites)
 	- [Your OpenAI API key](#your-openai-api-key)
