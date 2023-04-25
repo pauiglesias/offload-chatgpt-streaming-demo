@@ -86,7 +86,7 @@ In order to stop and remove the running container, execute this command:
 docker container stop offloadgpt && docker container rm offloadgpt
 ```
 
-### Or start with PHP server
+### Or start with the built-in PHP server
 
 If you have PHP installed in your machine, a standalone PHP server is provided with PHP, so you can run this project from command line typing this command:
 
