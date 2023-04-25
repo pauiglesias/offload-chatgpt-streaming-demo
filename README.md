@@ -113,4 +113,8 @@ And then open this address in your browser:
 
 This project only stores the location of the generated URLs by OffloadGPT and the minimum related data, like the title of the conversation or a Bearer Token if the status Url is private.
 
-The data is located at the `server/data` directory from the root of this project, and it consists of a per user JSON file where is stored the conversations list.
+The data is located in the `server/data` directory at the root of this project, and it consists of a JSON file per user where the conversations list is stored
+
+The filename is composed of a randomly generated string of 16 characters, generated at the client-side.
+
+Using single JSON files in this manner is only intended for demonstration purposes and is not recommended for live production servers.
