@@ -92,8 +92,8 @@ function remoteRequestOptions($args, $endpoint) {
 	$headers =[
 		'Content-Type: application/json',
 		'X-OpenAI-API-Key: '.OPENAI_API_KEY,
-		'X-RapidAPI-Key: '.OFFLOAD_GPT_RAPIDAPI_KEY,
-		'X-RapidAPI-Host: '.OFFLOAD_GPT_RAPIDAPI_HOST,
+		'X-RapidAPI-Key: '	.OFFLOAD_GPT_RAPIDAPI_KEY,
+		'X-RapidAPI-Host: '	.OFFLOAD_GPT_RAPIDAPI_HOST,
 	];
 
 	$organization = defined('OPENAI_ORGANIZATION') ? OPENAI_ORGANIZATION : '';
@@ -110,8 +110,35 @@ function remoteRequestOptions($args, $endpoint) {
 		CURLOPT_HTTP_VERSION	=> CURL_HTTP_VERSION_1_1,
 		CURLOPT_HTTPHEADER		=> $headers,
 		CURLOPT_CUSTOMREQUEST	=> 'POST',
-		CURLOPT_POSTFIELDS		=> @json_encode($args, JSON_UNESCAPED_SLASHES),
+		CURLOPT_POSTFIELDS		=> @json_encode(remoteRequestArgs($args), JSON_UNESCAPED_SLASHES),
 	];
+}
+
+
+
+function remoteRequestArgs($args) {
+
+	if (!function_exists('defaultChatGptArgs')) {
+		return $args;
+	}
+
+	$defaultArgs = defaultChatGptArgs();
+	if (empty($defaultArgs) || !is_array($defaultArgs)) {
+		return $args;
+	}
+
+	$chatgptArgs = [];
+	foreach ($defaultArgs as $key => $value) {
+		if (isset($value)) {
+			$chatgptArgs[$key] = $value;
+		}
+	}
+
+	if (empty($chatgptArgs)) {
+		return $args;
+	}
+
+	return array_merge($chatgptArgs, $args);
 }
 
 

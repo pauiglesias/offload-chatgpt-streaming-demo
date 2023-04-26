@@ -39,7 +39,24 @@ define('OFFLOAD_GPT_BASE_URL', 'https://offloadgpt.p.rapidapi.com/v1');
 
 
 /**
- * Privacy settings on Endpoints Urls
- * Allowed values: `public` or `private`
+ * Default ChatGPT settings
  */
-define('OFFLOAD_GPT_ACCESS', 'public');
+function defaultChatGptArgs() {
+
+	return [
+
+		/**
+		 * Privacy settings on Endpoints Urls
+		 * Allowed values: `public` or `private`
+		 * Default: `public`
+		 */
+		'access'	=> null,
+
+		/**
+		 * https://platform.openai.com/docs/models
+		 */
+		'model'		=> null,
+
+	];
+
+}
