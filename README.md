@@ -73,7 +73,11 @@ From the `server/scripts/php` directory:
 
 - Copy or rename the `config-sample.php` file to `config.php`
 - Fill the constants with your **OpenAI API Key**, and the **RAPIDAPI Keys**
-- Specify `public` or `private` access constant to define the URLs privacy.
+- Check the `defaultChatGptArgs` function where you can modify arguments like:
+  - The `public` or `private` access to define the URLs privacy.
+  - A Webhook URL to POST data after the process is finished.
+  - The OpenAI `model` Id to use in your requests.
+  - Other params like `temperature`, `max_tokens`, etc.
 
 ## Execution
 
