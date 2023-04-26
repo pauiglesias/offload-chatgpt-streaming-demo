@@ -20,7 +20,9 @@ $(function() {
 
 
 	$('.chat-input-text textarea').keypress(function(e) {
+
 		const code = e.keyCode ? e.keyCode : e.which;
+
 		if (13 === code) {
 			userMessage($(this).closest('.chat-input'));
 			return false;
@@ -39,8 +41,8 @@ $(function() {
 
 		$(this).css('height', height + 'px');
 
-		unreadyInputButton($(this));
-		enableInputButton($(this).closest('.chat-content'), $(this).hasClass('chat-input-ready'));
+		inputReady($(this));
+
 	});
 
 
@@ -71,9 +73,8 @@ $(function() {
 
 		$input.val('');
 		$input.css('height', inputHeight + 'px');
-		unreadyInputButton($input, true);
+		inputReady($input, false);
 
-		enableInputButton($content, false);
 		const input = prepareOutput(escapeHtml(message), '');
 		const $div = addMessage($content, input, 'input');
 		$div.addClass('chat-messages-input-wait');
@@ -122,15 +123,13 @@ $(function() {
 
 			if (!e || !e.status) {
 				setStreaming($content, false);
-				unreadyInputButton($input);
-				enableInputButton($content, true);
+				inputReady($input);
 				return;
 			}
 
 			if ('success' != e.status) {
 				setStreaming($content, false);
-				unreadyInputButton($input);
-				enableInputButton($content, true);
+				inputReady($input);
 				return;
 			}
 
@@ -159,8 +158,7 @@ $(function() {
 		}).fail(function(e) {
 			console.log(e);
 			setStreaming($content, false);
-			unreadyInputButton($input);
-			enableInputButton($content, true);
+			inputReady($input);
 		});
 
 	}
@@ -270,8 +268,7 @@ $(function() {
 		autoscroll = false;
 		autoscrollDiv = null;
 
-		unreadyInputButton($input);
-		enableInputButton($content, true);
+		inputReady($input);
 
 		$content.removeAttr('data-stop-url');
 	}
@@ -301,8 +298,7 @@ $(function() {
 		}
 
 		setStreaming($content, true);
-		enableInputButton($content, false);
-		unreadyInputButton($content.find('.chat-input-text textarea'), true);
+		inputReady($content.find('.chat-input-text textarea'));
 
 		$content.attr('data-status-url', $content.attr('data-from-status-url'));
 		$content.attr('data-bearer-token', $content.attr('data-from-bearer-token'));
@@ -467,17 +463,16 @@ $(function() {
 
 
 
-	function enableInputButton($content, enable) {
-		const $button = $content.find('.chat-input-text button[type="submit"]');
-		enable ? $button.removeAttr('disabled') : $button.attr('disabled', 'disabled');
-	}
+	function inputReady($input, force) {
 
+		const unready = 'undefined' === typeof force ? false : false === force;
+		const ready = !(unready || streaming || '' === $input.val().trim());
 
+		const $parent = $input.closest('.chat-input-text');
+		ready ? $parent.addClass('chat-input-ready') : $parent.removeClass('chat-input-ready');
 
-	function unreadyInputButton($input, unready) {
-		unready || streaming || '' === $input.val().trim()
-			? $input.closest('.chat-input-text').removeClass('chat-input-ready')
-			: $input.closest('.chat-input-text').addClass('chat-input-ready');
+		const $button = $parent.find('button[type="submit"]');
+		ready ? $button.removeAttr('disabled') : $button.attr('disabled', 'disabled')
 	}
 
 
@@ -731,12 +726,12 @@ $(function() {
 
 		regenerative($content, false);
 		setStreaming($content, false);
-		resetChatInput($content);
 
 		$(this).closest('.chat-sidebar-list').find('.chat-sidebar-item').removeClass('chat-sidebar-selected').removeClass('chat-sidebar-loading');
 		$(this).addClass('chat-sidebar-loading');
 
-		enableInputButton($content, false);
+		inputReady($content.find('.chat-input-text textarea'), false);
+
 		loadChat($content, $(this).attr('data-chat-id'));
 
 		return false;
@@ -752,7 +747,6 @@ $(function() {
 
 		setStreaming($content, false);
 		resetChatMessages($content);
-		resetChatInput($content);
 
 		const $item = $(this).closest('.chat-sidebar-item');
 		const chatId = $item.attr('data-chat-id');
@@ -776,8 +770,6 @@ $(function() {
 				.removeAttr('data-stop-url')
 				.removeAttr('data-bearer-token')
 				.removeClass('chat-awaiting');
-
-		enableInputButton($content, false);
 	}
 
 
@@ -785,7 +777,7 @@ $(function() {
 	function resetChatInput($content) {
 		$input = $content.find('.chat-input textarea');
 		$input.val('').focus();
-		unreadyInputButton($input);
+		inputReady($input);
 	}
 
 
@@ -795,6 +787,7 @@ $(function() {
 		const watermarkId = watermark($content);
 
 		$content.addClass('chat-content-loading');
+		const $input = $content.find('.chat-input-text textarea');
 
 		const data = {
 			action	: 'chat',
@@ -809,6 +802,7 @@ $(function() {
 			}
 
 			if (!e || !e.status_url) {
+				inputReady($input);
 				$content.removeClass('chat-content-loading');
 				return;
 			}
@@ -816,7 +810,14 @@ $(function() {
 			loadChatJson($content, chatId, e.status_url, e.bearer_token, e.from_bearer_token);
 
 		}).fail(function() {
+
+			if (!watermark($content, watermarkId)) {
+				return;
+			}
+
+			inputReady($input);
 			$content.removeClass('chat-content-loading');
+
 		});
 
 	}
@@ -826,6 +827,7 @@ $(function() {
 	function loadChatJson($content, chatId, statusUrl, bearerToken, fromBearerToken) {
 
 		const watermarkId = watermark($content);
+		const $input = $content.find('.chat-input-text textarea');
 
 		$content.attr('data-conversation-id', chatId);
 		$content.attr('data-status-url', statusUrl);
@@ -833,7 +835,9 @@ $(function() {
 		$content.removeAttr('data-stop-url');
 
 		$.ajax({
+
 			url: statusUrl,
+
 			beforeSend: function(xhr) {
 				if (bearerToken) {
 					xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken);
@@ -854,8 +858,8 @@ $(function() {
 				return;
 			}
 
+			inputReady($input);
 			$content.removeClass('chat-content-loading');
-			streaming || enableInputButton($content, true);
 		});
 	}
 
