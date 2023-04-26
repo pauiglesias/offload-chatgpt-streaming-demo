@@ -40,6 +40,7 @@ $(function() {
 		$(this).css('height', height + 'px');
 
 		unreadyInputButton($(this));
+		enableInputButton($(this).closest('.chat-content'), $(this).hasClass('chat-input-ready'));
 	});
 
 
