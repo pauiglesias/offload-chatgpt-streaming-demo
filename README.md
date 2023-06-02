@@ -5,12 +5,10 @@
 
 A ChatGPT clone that allows users to [chat with OpenAI](https://platform.openai.com/docs/guides/chat) language models.
 
-It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offloadgpt), a service that enables ChatGPT API deferred responses:
+It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offloadgpt), a service that enables ChatGPT API deferred responses.
 
-- Delegates API requests and relieves your server load.
-- Stores Streaming and Asynchronous API responses.
-- Offload your server's workload to external resources.
-- Easily concatenates messages from previous responses.
+You can check the complete documentation here:
+[https://docs.offloadgpt.com](https://docs.offloadgpt.com)
 
 **Table of Contents:**
 
