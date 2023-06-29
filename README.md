@@ -8,7 +8,7 @@ A ChatGPT clone that allows users to [chat with OpenAI](https://platform.openai.
 It is powered by the [OffloadGPT API](https://rapidapi.com/microdeploy/api/offloadgpt), a service that enables ChatGPT API deferred responses.
 
 You can check the complete documentation here:
-[https://docs.offloadgpt.com](https://docs.offloadgpt.com)
+[https://offloadgpt-docs.microdeploy.com](https://offloadgpt-docs.microdeploy.com)
 
 **Table of Contents:**
 
